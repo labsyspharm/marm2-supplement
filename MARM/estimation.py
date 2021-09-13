@@ -59,8 +59,8 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
 
     full_parameters = set()
     for param in full_model.getParameterIds():
-        for rafi, prafi, meki in itertools.product(RAFI, PANRAFI, MEKI):
-            full_parameters.add(specialise_par_name(param, prafi, rafi, meki))
+        for rafi, meki in itertools.product(RAFI + PANRAFI, MEKI):
+            full_parameters.add(specialise_par_name(param, rafi, meki))
     full_parameters = sorted(list(full_parameters))
 
     instance_vars = dataset.split('_')
@@ -86,8 +86,6 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                     map_sim_var={
                         model_param: specialise_par_name(
                             model_param,
-                            'LY3009120' if prafi is None and not multimodel
-                            else prafi,
                             'Vemurafenib' if rafi is None and not multimodel
                             else rafi,
                             'Cobimetinib' if meki is None and not multimodel
@@ -104,7 +102,7 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                         )
                     }
                 )
-                for prafi, rafi, meki, _ in edatas
+                for rafi, meki, _ in edatas
             ])
 
             objectives.append(pypesto.objective.AmiciObjective(
@@ -504,15 +502,6 @@ def get_edata(dataset, instance, model):
     else:
         exp_data = exp_data[
             (exp_data[[f'{drug}_0' for drug in RAFI]] > 0).any(axis=1)
-        ]
-
-    if 'prafi' not in instances:
-        exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in PANRAFI]] == 0).all(axis=1)
-        ]
-    else:
-        exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in PANRAFI]] > 0).any(axis=1)
         ]
 
     if 'meki' not in instances:
