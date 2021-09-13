@@ -108,7 +108,7 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
                 solver,
-                [e[3] for e in edatas],
+                [e[2] for e in edatas],
                 x_ids=full_parameters,
                 parameter_mapping=parameter_mapping,
                 max_sensi_order=None,
