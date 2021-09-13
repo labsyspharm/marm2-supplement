@@ -1,6 +1,7 @@
 import sys
 import pysb
 from MARM.paths import get_model_instance_name
+import MARM
 
 model_name = sys.argv[1]
 variant = sys.argv[2]
