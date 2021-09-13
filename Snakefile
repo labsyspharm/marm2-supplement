@@ -5,7 +5,7 @@ from MARM.paths import (
 	get_analysis_results_file, get_parameters_file, get_figure_dir
 )
 from MARM.estimation import RAFI, PANRAFI, MEKI
-from .read_data import (
+from MARM.read_data import (
 	DATAFILES_ESTIMATION, DATAFILES_PREDICTION_COMBO, DATAFILES_PANRAFCOMBO,
 	DATAFILES_PREDICTION_SINGLE, DATAFILES_MUTRAS_ENGINEERED,
 	DATAFILES_MUTRAS_ENGINEERED_COMBO
@@ -131,7 +131,7 @@ rule process_data:
 				   d=DATAFILES_CSV),
 		xls=expand(os.path.join('MARM', 'data', '{d}'),
 				   d=DATAFILES_XLS),
-		script='read_data.py',
+		script='MARM/read_data.py',
 	output:
 		os.path.join('MARM', 'data', 'processed_{dataset}.csv'),
 	wildcard_constraints:
