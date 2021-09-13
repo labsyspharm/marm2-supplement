@@ -21,7 +21,7 @@ setup(name='MARM',
             'snakemake',
             'tabulate',
             'sklearn',
-            'pysb@https://github.com/FFroehlich/pysb@energy_modeling',
+            'pysb@git+https://github.com/FFroehlich/pysb@energy_modeling',
             'scipy',
             'networkx'
       ],
