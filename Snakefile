@@ -96,28 +96,11 @@ rule clean:
 		rm -rf logs/cluster/*.out
 		'''
 
-rule build_variant:
-	input:
-		expand(os.path.join('MARM', 'models', 'modules', '{file}.py'),
-							file=module_files),
-		script='generate_model_variant.py',
-		model_file=os.path.join('MARM', 'models', '{model}.py'),
-		marm_model=os.path.join('MARM', 'model.py'),
-
-	output:
-		get_model_variant_file('{model}','{variant}')
-	wildcard_constraints:
-		model='[A-Z]+',
-		variant='[\w]+',
-	shell:
-		'python3 {input.script} {wildcards.model} {wildcards.variant}'
-
 
 rule build_instance:
 	input:
-		rules.build_variant.output,
 		script='build_model_instance.py',
-		model_file=os.path.join('MARM', 'models', '{model}.py'),
+		get_model_variant_file('{model}','{variant}')
 	output:
 		get_model_module_file_instance('{model}', '{variant}', '{instance}',
 									   '{modifications}'),
