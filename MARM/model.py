@@ -176,10 +176,6 @@ def export_formats(model, base_dir, formats):
                 f.write(pysb.export.export(model, language))
 
 
-def write_aux_model_functions(model):
-    simplify_energy_rates(model)
-
-
 def compile_model(model):
     base_dir = os.path.dirname(__file__)
 
@@ -196,15 +192,6 @@ def compile_model(model):
                                  observables=observables,
                                  constant_parameters=CONSTANTS,
                                  compute_conservation_laws=True)
-
-
-def get_model_module(name):
-    try:
-        model_module = importlib.import_module(f'.{name}', __name__)
-    except ImportError:
-        raise ValueError(f'Model `{name}` is not available.')
-
-    return model_module
 
 
 def add_monomer_configuration_observables(model):

@@ -17,7 +17,11 @@ if len(sys.argv) > 3:
 else:
     instance = ''
 
-INSTANCES = MARM.model.get_model_module(model_name).INSTANCES
+INSTANCES = {
+    'EGF': 'initEGF',
+    'RAFi': 'initRAFi',
+    'MEKi': 'initMEKi',
+}
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
 model.name = get_model_instance_name(model_name, variant, instance,
@@ -78,5 +82,4 @@ if 'monoobs' in modifications:
 MARM.model.cleanup_unused(model)
 MARM.model.export_model(model, ['pysb_flat', 'bngl'])
 MARM.model.generate_equations(model)
-MARM.model.write_aux_model_functions(model)
 MARM.model.compile_model(model)
