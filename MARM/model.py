@@ -1,11 +1,12 @@
 import pysb
 import pysb.bng
+import pysb.export
 import os
 import importlib
 import re
 import itertools
 import copy
-import amici
+import amici.pysb_import
 import logging
 
 import sympy as sp
