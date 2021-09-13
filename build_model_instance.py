@@ -1,11 +1,6 @@
 import sys
 import pysb
-import MARM.models
 from MARM.paths import get_model_instance_name
-from MRBM.modules import (
-    add_monomer_configuration_observables, add_monomer_label,
-    propagate_monomer_label
-)
 
 model_name = sys.argv[1]
 variant = sys.argv[2]
@@ -21,7 +16,7 @@ if len(sys.argv) > 3:
 else:
     instance = ''
 
-INSTANCES = MARM.models.get_model_module(model_name).INSTANCES
+INSTANCES = MARM.model.get_model_module(model_name).INSTANCES
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
 model.name = get_model_instance_name(model_name, variant, instance,
@@ -33,7 +28,7 @@ else:
     modifications = modifications.split('_')
 
 if 'channel' in modifications:
-    add_monomer_label(
+    MARM.model.add_monomer_label(
         model,
         'MEK',
         'pMEK',
@@ -58,7 +53,7 @@ if 'channel' in modifications:
         },
         'MEK_is_dephosphorylated'
     )
-    propagate_monomer_label(
+    MARM.model.propagate_monomer_label(
         model,
         'MEK',
         'ERK',
@@ -77,7 +72,7 @@ if 'channel' in modifications:
     )
 
 if 'monoobs' in modifications:
-    add_monomer_configuration_observables(model)
+    MARM.model.add_monomer_configuration_observables(model)
 
 MARM.model.cleanup_unused(model)
 MARM.model.export_model(model, ['pysb_flat', 'bngl'])

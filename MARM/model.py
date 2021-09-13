@@ -2,8 +2,16 @@ import pysb
 import pysb.bng
 import os
 import importlib
+import re
+import itertools
+import copy
+import amici
+import logging
 
 import sympy as sp
+
+from shutil import copyfile
+from pysb.bng import BngFileInterface
 
 from .paths import get_model_instance_name, get_model_name_variant
 
@@ -188,3 +196,178 @@ def compile_model(model):
                                  observables=observables,
                                  constant_parameters=CONSTANTS,
                                  compute_conservation_laws=True)
+
+
+def get_model_module(name):
+    try:
+        model_module = importlib.import_module(f'.{name}', __name__)
+    except ImportError:
+        raise ValueError(f'Model `{name}` is not available.')
+
+    return model_module
+
+
+def add_monomer_configuration_observables(model):
+    for monomer in model.monomers:
+        site_states = copy.copy(model.components[monomer.name].site_states)
+        for site in model.components[monomer.name].sites:
+            if site not in site_states:
+                site_states[site] = [None, pysb.ANY]
+
+        combos = list(itertools.product(*site_states.values()))
+        explicit_states = [
+            {key: combo[ikey] for ikey, key in enumerate(site_states.keys())}
+            for combo in combos
+        ]
+
+        for state in explicit_states:
+            pysb.Observable(
+                expl_name(model.components[monomer.name](**state)),
+                model.components[monomer.name](**state)
+            )
+
+
+def expl_name(name):
+    name = str(name)
+    name = re.sub(r', [\w]*=None', '', name)
+    name = re.sub(r'\([\w]*=None, ', '(', name)
+    name = re.sub(r'\([\w]*=None\)', '__mono', name)
+    name = re.sub(r'\(\)', '__mono', name)
+    name = re.sub(r'AA([0-9]+)=', '\g<1>', name)
+    name = name.replace('=ANY', '')
+    name = name.replace(' ', '')
+    name = name.replace("'", "")
+    name = name.replace(',', '_')
+    name = name.replace('=', '')
+    name = name.replace('(', '__')
+    name = name.replace(')', '')
+
+    return 'expl_' + name
+
+
+def add_monomer_label(model, monomer, name, label_site,
+                      act_rules, deact_rule):
+
+    channels = list(act_rules.keys())
+    mono = model.monomers[monomer]
+    mono.sites += ['channel']
+    mono.site_states['channel'] = channels + ['NA']
+
+    for initial in model.initials:
+        for mp in initial.pattern.monomer_patterns:
+            if mp.monomer.name == monomer:
+                mp.site_conditions['channel'] = 'NA'
+                if hasattr(initial.pattern, 'canonical_repr'):
+                    initial.pattern.canonical_repr = None
+
+    for channel in channels:
+        pysb.Expression(
+            f'{name}_{channel}_obs',
+            model.parameters[f'{name}_IF_scale'] *
+            pysb.Observable(
+                f'{name}_{channel}',
+                mono(channel=channel)
+            )/model.observables[f't{monomer}']
+        )
+
+    for ia, (channel, rules) in enumerate(act_rules.items()):
+        for rule in rules:
+            if rule not in model.rules.keys():
+                continue
+
+            for cp in model.rules[rule].reactant_pattern.complex_patterns + \
+                    model.rules[rule].product_pattern.complex_patterns:
+                for mp in cp.monomer_patterns:
+                    if mp.monomer.name == monomer \
+                            and label_site[0] in mp.site_conditions:
+                        if mp.site_conditions[label_site[0]] == label_site[1]:
+                            mp.site_conditions['channel'] = channel
+                        else:
+                            mp.site_conditions['channel'] = 'NA'
+
+        if deact_rule in model.rules.keys():
+            for cp in model.rules[deact_rule].reactant_pattern.complex_patterns\
+                    + model.rules[deact_rule].product_pattern.complex_patterns:
+                for mp in cp.monomer_patterns:
+                    if mp.monomer.name == monomer \
+                            and label_site[0] in mp.site_conditions:
+                        if mp.site_conditions[label_site[0]] == label_site[1]:
+                            mp.site_conditions['channel'] = channel
+                        else:
+                            mp.site_conditions['channel'] = 'NA'
+
+        if ia < len(channels) - 1:
+            rule_copy = copy.deepcopy(model.rules[deact_rule])
+            rule_copy.name = f'{deact_rule}_{channel}'
+            model.add_component(rule_copy)
+        else:
+            model.rules[deact_rule].name = f'{deact_rule}_{channel}'
+
+    return model
+
+
+def propagate_monomer_label(model, source_monomer, target_monomer, name,
+                            channels, trans_rule, rem_rule,
+                            label_site):
+
+    mono = model.monomers[target_monomer]
+    mono.sites += ['channel']
+    mono.site_states['channel'] = channels + ['NA']
+
+    for initial in model.initials:
+        for mp in initial.pattern.monomer_patterns:
+            if mp.monomer.name == target_monomer:
+                mp.site_conditions['channel'] = 'NA'
+                if hasattr(initial.pattern, 'canonical_repr'):
+                    initial.pattern.canonical_repr = None
+
+    for ia, channel in enumerate(channels):
+        pysb.Expression(
+            f'{name}_{channel}_obs',
+            model.parameters[f'{name}_IF_scale'] *
+            pysb.Observable(
+                f'{name}_{channel}',
+                mono(channel=channel)
+            )/model.observables[f't{target_monomer}']
+        )
+
+        if trans_rule not in model.rules.keys():
+            continue
+
+        for cp in model.rules[trans_rule].reactant_pattern.complex_patterns + \
+                  model.rules[trans_rule].product_pattern.complex_patterns:
+            for mp in cp.monomer_patterns:
+                if mp.monomer.name == target_monomer \
+                        and label_site[0] in mp.site_conditions:
+                    if mp.site_conditions[label_site[0]] == label_site[1]:
+                        mp.site_conditions['channel'] = channel
+                    else:
+                        mp.site_conditions['channel'] = 'NA'
+                if mp.monomer.name == source_monomer \
+                        and mp.site_conditions.get(label_site[0], '') == label_site[1]:
+                    mp.site_conditions['channel'] = channel
+
+        if ia < len(channels) - 1:
+            rule_copy = copy.deepcopy(model.rules[trans_rule])
+            rule_copy.name = f'{trans_rule}_{channel}'
+            model.add_component(rule_copy)
+        else:
+            model.rules[trans_rule].name = f'{trans_rule}_{channel}'
+
+        if rem_rule in model.rules.keys():
+            for cp in model.rules[rem_rule].reactant_pattern.complex_patterns + \
+                      model.rules[rem_rule].product_pattern.complex_patterns:
+                for mp in cp.monomer_patterns:
+                    if mp.monomer.name == target_monomer \
+                            and label_site[0] in mp.site_conditions:
+                        if mp.site_conditions[label_site[0]] == label_site[1]:
+                            mp.site_conditions['channel'] = channel
+                        else:
+                            mp.site_conditions['channel'] = 'NA'
+
+        if ia < len(channels) - 1:
+            rule_copy = copy.deepcopy(model.rules[rem_rule])
+            rule_copy.name = f'{rem_rule}_{channel}'
+            model.add_component(rule_copy)
+        else:
+            model.rules[rem_rule].name = f'{rem_rule}_{channel}'
