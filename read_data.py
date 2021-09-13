@@ -20,7 +20,6 @@ DATAFILES_MUTRAS_ENGINEERED_COMBO = [
     '20200119_A375_NRASQ61K_matrix_pERK_DOX_RAFi_MEKi',
     '20200130_A375_NRASQ61K_matrix_pERK_DOX_RAFifixed_panRAFi_MEKi.xls'
 ]
-DATAFILES_HT29 = ['20200128_HT29_matrix_EGF_RAFi_MEKi']
 DATAFOLDER = os.path.join(os.path.dirname(MARM.__file__), 'data')
 
 pERK_IF_std = 0.2
@@ -693,7 +692,6 @@ def load_experiment(IDs):
             read_T_experiment(data, df, [spec])
 
         if ID in [*DATAFILES_PANRAFCOMBO,
-                  *DATAFILES_HT29,
                   '20200119_A375_NRASQ61K_matrix_pERK_DOX_RAFi_MEKi',
                   '20200130_A375_NRASQ61K_matrix_pERK_DOX_RAFifixed_panRAFi_MEKi.xls']:
             if ID in DATAFILES_PANRAFCOMBO:
@@ -710,8 +708,7 @@ def load_experiment(IDs):
 
             for ir, row in df.iterrows():
                 egfr_crispr = 1.0 \
-                    if row.Cell_line in ['A375', 'HT29',
-                                         'A375_NRAS_Q61K_DOXind'] \
+                    if row.Cell_line in ['A375', 'A375_NRAS_Q61K_DOXind'] \
                     else pow(2,  3.2)
                 drug_a = row['Drug A']
                 drug_b = row['Drug B']
@@ -742,40 +739,6 @@ def load_experiment(IDs):
                     data_dict['Vemurafenib_0'] = 1.0
                     data_dict['Vemurafenib_0_preeq'] = 1.0
                     data_dict['Vemurafenib_0_presim'] = 1.0
-
-                fill_data_dict(data, data_dict)
-
-                data.loc[len(data)] = data_dict
-
-        if ID == 'M1_Naive_pERK_DoseResponse':
-            df = pd.read_csv(filename)
-            df.loc[df.Drug == 'AZ628', 'Drug'] = 'AZ_628'
-            df = df[df.Drug.apply(lambda x: x in RAFI + PANRAFI + MEKI + [
-                'DMSO'])]
-
-            for ir, row in df.iterrows():
-                data_dict = {
-                    'time': 0.0,
-                    't_presim': 0.0,
-                    'EGF_0': 0.0,
-                    'EGF_0_preeq': 0.0,
-                    'EGF_0_presim': 0.0,
-                    'EGFR_crispr': 1.0,
-                    'EGFR_crispr_preeq': 1.0,
-                    'EGFR_crispr_presim': 1.0,
-                    'NRAS_Q61mut': 1.0
-                    if row.CellLine == 'M1(NRAS)' else 0.0,
-                    'NRAS_Q61mut_preeq': 1.0
-                    if row.CellLine == 'M1(NRAS)' else 0.0,
-                    'NRAS_Q61mut_presim': 1.0
-                    if row.CellLine == 'M1(NRAS)' else 0.0,
-                    'pERK_IF_obs': row['pERK (Raw fluorescence)'],
-                    'pERK_IF_obs_std': pERK_IF_std,
-                }
-                if row.Drug != 'DMSO':
-                    for suffix in ['', '_preeq', '_presim']:
-                        data_dict[f'{row.Drug}_0{suffix}'] = \
-                            row['Concentration (µM)']
 
                 fill_data_dict(data, data_dict)
 

@@ -5,6 +5,18 @@ from MARM.paths import (
 	get_analysis_results_file, get_parameters_file, get_figure_dir
 )
 from MARM.estimation import RAFI, PANRAFI, MEKI
+from .read_data import (
+	DATAFILES_ESTIMATION, DATAFILES_PREDICTION_COMBO, DATAFILES_PANRAFCOMBO,
+	DATAFILES_PREDICTION_SINGLE, DATAFILES_MUTRAS_ENGINEERED,
+	DATAFILES_MUTRAS_ENGINEERED_COMBO
+)
+DATAFILES = list(set(
+	DATAFILES_ESTIMATION + DATAFILES_PREDICTION_COMBO + DATAFILES_PANRAFCOMBO
+	+ DATAFILES_PREDICTION_SINGLE + DATAFILES_MUTRAS_ENGINEERED +
+	DATAFILES_MUTRAS_ENGINEERED_COMBO
+))
+DATAFILES_CSV = [d for d in DATAFILES if not d.endswith('.xls')]
+DATAFILES_XLS = [d for d in DATAFILES if d.endswith('.xls')]
 import itertools
 
 MODEL = 'RTKERK'
@@ -65,7 +77,7 @@ module_files = glob_wildcards(os.path.join('MARM', 'models', 'modules',
 										   '{file}.py'))[0]
 
 localrules: multistart_estimation, multimodel_benchmark,
-		  process_data, build_variant, collect_results_benchmark,
+		  process_data, collect_results_benchmark,
 		  collect_results_estimation, clean, generate_figures
 
 rule multistart_estimation:
@@ -115,8 +127,10 @@ rule build_instance:
 
 rule process_data:
 	input:
-		xls=expand(os.path.join('MARM', 'data', '{ds}.csv'),
-				   ds=['D1', 'D2', 'D4', 'D8', 'DP1', 'DP2']),
+		csv=expand(os.path.join('MARM', 'data', '{d}.csv'),
+				   d=DATAFILES_CSV),
+		xls=csv=expand(os.path.join('MARM', 'data', '{d}'),
+				       d=DATAFILES_XLS),
 		script='read_data.py',
 	output:
 		os.path.join('MARM', 'data', 'processed_{dataset}.csv'),
