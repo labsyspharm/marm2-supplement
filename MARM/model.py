@@ -7,9 +7,12 @@ import sympy as sp
 
 from pysb.core import SelfExporter
 
-from .models import globals, generate_model
 from .models import add_additional_observables
 from .paths import get_model_instance_name, get_model_name_variant
+
+CONSTANTS = [
+    'RAFi_0', 'MEKi_0', 'EGF_0', 'EGFR_crispr', 'NRAS_Q61mut',
+]
 
 
 def cleanup_unused(model):
@@ -174,20 +177,17 @@ def write_aux_model_functions(model):
 
 def compile_model(model):
     base_dir = os.path.dirname(__file__)
-    compile_model_amici(model, globals.constants, base_dir)
 
-
-def compile_model_amici(model, constants, basedir):
     observables = [
         obs.name for obs in model.expressions
         if obs.name.endswith('_obs')
     ]
 
-    outdir = os.path.join(basedir, 'build', model.name)
+    outdir = os.path.join(base_dir, 'build', model.name)
 
     amici.pysb_import.pysb2amici(model,
                                  outdir,
                                  verbose=logging.INFO,
                                  observables=observables,
-                                 constant_parameters=constants,
+                                 constant_parameters=CONSTANTS,
                                  compute_conservation_laws=True)
