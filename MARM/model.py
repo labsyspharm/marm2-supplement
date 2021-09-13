@@ -5,9 +5,6 @@ import importlib
 
 import sympy as sp
 
-from pysb.core import SelfExporter
-
-from .models import add_additional_observables
 from .paths import get_model_instance_name, get_model_name_variant
 
 CONSTANTS = [
