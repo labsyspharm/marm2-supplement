@@ -366,9 +366,6 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                   if name.endswith('_phi') and idx not in fixed_idx]
 
     panraf_energies = [
-        'ep_RAF_RAF_mod_RAFi_single_deltaG'.replace('RAFi', rafi)
-        for rafi in PANRAFI
-    ] + [
         'ep_RAF_RAF_mod_RAFi_double_deltaG'.replace('RAFi', rafi)
         for rafi in PANRAFI
     ]
