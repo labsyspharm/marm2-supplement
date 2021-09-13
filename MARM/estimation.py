@@ -379,8 +379,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
     fixed_vals.append(0.0)
     fixed_idx.append(names.index('ep_RAF_RAF_mod_PLX8394_single_deltaG'))
 
-    #fixed_vals += [0.0 for _ in panraf_energies]
-    #fixed_idx += [names.index(name) for name in panraf_energies]
+    fixed_vals += [0.0 for _ in panraf_energies]
+    fixed_idx += [names.index(name) for name in panraf_energies]
 
     for val, idx in zip(fixed_vals, fixed_idx):
         print(f'fixing {names[idx]} to {val}')
