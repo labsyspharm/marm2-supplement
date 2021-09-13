@@ -129,8 +129,8 @@ rule process_data:
 	input:
 		csv=expand(os.path.join('MARM', 'data', '{d}.csv'),
 				   d=DATAFILES_CSV),
-		xls=csv=expand(os.path.join('MARM', 'data', '{d}'),
-				       d=DATAFILES_XLS),
+		xls=expand(os.path.join('MARM', 'data', '{d}'),
+				   d=DATAFILES_XLS),
 		script='read_data.py',
 	output:
 		os.path.join('MARM', 'data', 'processed_{dataset}.csv'),
