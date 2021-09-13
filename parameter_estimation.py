@@ -19,7 +19,7 @@ n_threads = int(sys.argv[6])
 dataset = '_'.join(sorted(dataset.split('_')))
 
 optim_options = {
-    fides.Options.XATOL: 1e-12,
+    fides.Options.XTOL: 1e-12,
     fides.Options.GATOL: 1e-4,
 }
 

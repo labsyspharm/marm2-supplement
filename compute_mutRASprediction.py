@@ -18,13 +18,7 @@ sxs = read_settings(sys.argv)
 cell_line = sys.argv[6]
 
 optim_options = {
-    'disp': True,
-    'xtol': 1e-12,
-    'gtol': 1e-4,
-}
-
-optim_options = {
-    fides.Options.XATOL: 1e-12,
+    fides.Options.XTOL: 1e-12,
     fides.Options.GATOL: 1e-4,
 }
 
