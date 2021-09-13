@@ -100,7 +100,7 @@ rule clean:
 rule build_instance:
 	input:
 		script='build_model_instance.py',
-		get_model_variant_file('{model}','{variant}')
+		model_file=get_model_variant_file('{model}','{variant}'),
 	output:
 		get_model_module_file_instance('{model}', '{variant}', '{instance}',
 									   '{modifications}'),
