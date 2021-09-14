@@ -4,7 +4,8 @@
 
 To set up MARM2.0, run `install_as_package.sh`. This will install all dependencies and
 MARM as in-source python package. If installation of independencies fails, please see the 
-documentation of the respective package (e.g., )
+documentation of the respective package (e.g., 
+[AMICI documentation](https://amici.readthedocs.io/en/latest/python_installation.html))
 
 As workflow manager for model calibration and analysis, MARM2.0 uses Snakemake, which 
 requires configuration through a JSON file. This JSON file must be named `cluster.json`, 
