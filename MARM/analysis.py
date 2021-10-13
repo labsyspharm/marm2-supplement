@@ -303,22 +303,6 @@ def rename_and_fill_drug_columns(df, rafi=None, meki=None):
 
 
 def load_model_aux(full_name):
-    reaction_flux = importlib.import_module(
-        f'.reaction_fluxes.{full_name}_reaction_flux', 'MARM',
-    ).reaction_flux
-
-    rule_flux = importlib.import_module(
-        f'.rule_fluxes.{full_name}_rule_flux', 'MARM',
-    ).rule_flux
-
-    pattern_flux = importlib.import_module(
-        f'.pattern_fluxes.{full_name}_pattern_flux', 'MARM',
-    ).pattern_flux
-
-    pattern_abundance = importlib.import_module(
-        f'.pattern_abundance.{full_name}_pattern_abundance', 'MARM'
-    ).pattern_abundance
-
     pysb_model = importlib.import_module(
         f'.pysb_flat.{full_name}', 'MARM',
     ).model
@@ -327,14 +311,7 @@ def load_model_aux(full_name):
         f'.observables.{full_name}_observable', 'MARM',
     ).observable
 
-    expression = importlib.import_module(
-        f'.expressions.{full_name}_expression', 'MARM',
-    ).expression
-
-    return (
-        pysb_model, observable, expression, pattern_abundance, reaction_flux,
-        pattern_flux, rule_flux
-    )
+    return pysb_model, observable
 
 
 def write_analysis_dataframe(df, s, filename):

@@ -190,7 +190,7 @@ rule compute_simulation_prediction:
 		data_single=os.path.join('MARM', 'data',
 								'processed_EGF_EGFR_MEKi_RAFi_singleprediction.csv'),
 		data_panRAF=os.path.join('MARM', 'data',
-								 'processed_EGF_EGFR_MEKi_RAFi_panfrafcomboprediction.csv'),
+								 'processed_EGF_EGFR_MEKi_RAFi_panrafcomboprediction.csv'),
 		script='compute_{rfile}.py',
 		parameters=get_parameters_file('{model}', '{variant}', '{dataset}'),
 	output:
@@ -345,7 +345,7 @@ rule generate_figures:
 			   model=[MODEL], variant=VARIANTS, dataset=DATASETS,
 			   rfile=['comboprediction', 'finepulse', 'feedback',
 					  'panrafcomboprediction', 'singleprediction',
-					  'trainingdata', 'mutRASprediction', 'ht29']),
+					  'trainingdata', 'mutRASprediction']),
 		expand(rules.generate_figure_transduction.output,
 			   model=[MODEL], variant=VARIANTS, dataset=DATASETS,
 			   drug=RAFI + MEKI + PANRAFI, perturbations=['']),
@@ -376,7 +376,7 @@ rule run_analysis:
 			   repeat=AJOBS, model=[MODEL], variant=VARIANTS,
 			   dataset=DATASETS,
 			   rfile=['trainingdata', 'comboprediction', 'finepulse',
-					  'panrafcomboprediction', 'singleprediction' , 'ht29']),
+					  'panrafcomboprediction', 'singleprediction']),
 
 
 rule collect_results_estimation:
@@ -450,7 +450,6 @@ rule process_all_data:
 							  'engineered_mutrasprediction',
 							  'engineered_mutrastraining',
 							  'comboprediction',
-							  'panfrafcomboprediction',
-							  'ht29']
+							  'panfrafcomboprediction']
 			] + DATASETS
 		)

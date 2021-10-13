@@ -14,7 +14,8 @@ import sympy as sp
 from shutil import copyfile
 from pysb.bng import BngFileInterface
 
-from .paths import get_model_instance_name, get_model_name_variant
+from .paths import (get_model_instance_name, get_model_name_variant,
+                    get_directory)
 
 CONSTANTS = [
     'RAFi_0', 'MEKi_0', 'EGF_0', 'EGFR_crispr', 'NRAS_Q61mut',
@@ -359,3 +360,46 @@ def propagate_monomer_label(model, source_monomer, target_monomer, name,
             model.add_component(rule_copy)
         else:
             model.rules[rem_rule].name = f'{rem_rule}_{channel}'
+
+
+def write_observable_function(model):
+    basedir = get_directory()
+    if not os.path.isdir(os.path.join(basedir, 'observables')):
+        os.mkdir(os.path.join(basedir, 'observables'))
+    with open(os.path.join(basedir, 'observables',
+                           f"{model.name}_observable.py"),
+              "w") as f:
+        f.write('from numpy import log, exp\n')
+        f.write('import numpy as np\n')
+        f.write('\n')
+        f.write('def observable(x, p):\n')
+
+        write_eval_states(model, f)
+        write_eval_params(model, f)
+
+        f.write('    return {\n')
+        for obs in model.observables:
+            if len(obs.coefficients):
+                f.write(f'        "{obs.name}": {sanitize(obs.expand_obs())},'
+                        f'\n')
+        f.write('    }\n')
+
+
+def sanitize(sym):
+    if isinstance(sym, pysb.Component):
+        return sym.name
+    else:
+        return str(sym)
+
+
+def write_eval_states(model, f):
+    for ix, specie in enumerate(model.species):
+        f.write(f'    __s{ix} = x[{ix}]\n')
+    f.write('\n')
+
+
+def write_eval_params(model, f):
+    for ip, par in enumerate(model.parameters):
+        f.write(f'    {par.name} = p[{ip}]\n')
+    f.write('\n')
+

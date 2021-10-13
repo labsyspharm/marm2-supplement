@@ -75,10 +75,7 @@ drug = drugs[drug_name]
 par, model, solver, full_name = load_model_solver(
     settings, **{drug['type']: drug_name}, mods='channel_monoobs'
 )
-(
-    pysb_model, observable, expression, pattern_abundance, reaction_flux,
-    pattern_flux, rule_flux
-) = load_model_aux(full_name)
+pysb_model, observable = load_model_aux(full_name)
 
 # set counterfactual parameters
 for genereg_feedback in ['SPRY', 'DUSP', 'EGFR']:

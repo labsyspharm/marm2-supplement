@@ -82,4 +82,5 @@ if 'monoobs' in modifications:
 MARM.model.cleanup_unused(model)
 MARM.model.export_model(model, ['pysb_flat', 'bngl'])
 MARM.model.generate_equations(model)
+MARM.model.write_observable_function(model)
 MARM.model.compile_model(model)

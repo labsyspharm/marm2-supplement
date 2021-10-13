@@ -31,13 +31,10 @@ def load_parameters(model, settings, rafi, meki, index=0,
 
     par = []
     for name in model.getParameterNames():
-        if specialise_par_name(name, rafi, meki) in df_parameters:
-            val = df_parameters.loc[index,
-                                    specialise_par_name(name, rafi, meki)]
-            model.setParameterByName(
-                name,
-                val
-            )
+        specialized_name = specialise_par_name(name, rafi, meki)
+        if specialized_name in df_parameters:
+            val = df_parameters.loc[index, specialized_name]
+            model.setParameterByName(name, val)
         elif allow_missing_pars:
             val = model.getParameterByName(name)
         else:
