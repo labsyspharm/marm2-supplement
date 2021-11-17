@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import numpy as np
 
 from MARM.estimation import get_model, RAFI, MEKI, PANRAFI
 from MARM.analysis import (
@@ -37,6 +38,29 @@ for obs in if_obs:
         offset.value = model.getParameterByName(f'{obs_name}_IF_offset')
         offset.variable = f'{obs_name}_background_obs'
         df_sim_obs = pd.concat([df_sim_obs, offset], ignore_index=True)
+
+matches = 0
+for ir, row in df_data_obs.iterrows():
+    if np.isnan(row.value):
+        continue
+    conds = ['Vemurafenib_0', 'Vemurafenib_0_preeq', 'Vemurafenib_0_presim',
+       'Dabrafenib_0', 'Dabrafenib_0_preeq', 'Dabrafenib_0_presim',
+       'PLX8394_0', 'PLX8394_0_preeq', 'PLX8394_0_presim', 'LY3009120_0',
+       'LY3009120_0_preeq', 'LY3009120_0_presim', 'AZ_628_0', 'AZ_628_0_preeq',
+       'AZ_628_0_presim', 'Cobimetinib_0', 'Cobimetinib_0_preeq',
+       'Cobimetinib_0_presim', 'Trametinib_0', 'Trametinib_0_preeq',
+       'Trametinib_0_presim', 'Selumetinib_0', 'Selumetinib_0_preeq',
+       'Selumetinib_0_presim', 'Binimetinib_0', 'Binimetinib_0_preeq',
+       'Binimetinib_0_presim', 'PD0325901_0', 'PD0325901_0_preeq',
+       'PD0325901_0_presim', 'EGF_0', 'EGFR_crispr', 't_presim', 'time'
+    ]
+    filter = df_sim_obs.variable == row.variable
+    for cond in conds:
+        filter = np.logical_and(filter, df_sim_obs[cond] == row[cond])
+    x = df_sim_obs.loc[filter,'value']
+    matches += (row.ymin<np.quantile(x ,0.1)) and (np.quantile(x ,0.9)<row.ymax)
+norm_matches = matches/sum(np.logical_not(np.isnan(df_data_obs.value)))
+print(f'simulation ci in data std: {norm_matches}%.')
 
 
 def apply_filters(df_filter, generic, specific):
