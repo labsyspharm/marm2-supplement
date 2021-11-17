@@ -494,11 +494,11 @@ def get_edata(dataset, instance, model):
 
     if 'rafi' not in instances:
         exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in RAFI]] == 0).all(axis=1)
+            (exp_data[[f'{drug}_0' for drug in RAFI + PANRAFI]] == 0).all(axis=1)
         ]
     else:
         exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in RAFI]] > 0).any(axis=1)
+            (exp_data[[f'{drug}_0' for drug in RAFI + PANRAFI]] > 0).any(axis=1)
         ]
 
     if 'meki' not in instances:
