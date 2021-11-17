@@ -94,10 +94,8 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
         'singleprediction': sxs['variant'],
         'comboprediction': sxs['variant'],
         'panrafcomboprediction': sxs['variant'],
-        'mutRASprediction_acquired': 'nrasq61mut',
         'mutRASprediction_engineered': 'nrasq61mut',
         'mutRASprediction_engineered_combo': 'nrasq61mut',
-        'ht29': sxs['variant']
     }
     obj = get_objective(sxs['model_name'], model_variant[filename],
                         sxs['dataset'], sxs['threads'],
@@ -108,106 +106,6 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
                                                      sxs['variant'],
                                                      sxs['dataset'])
         par = df_parameters.loc[sxs['index'], obj.x_names].values
-
-        if filename == 'ht29':
-            ccle_abundances = pd.read_csv(os.path.join(
-                get_directory(), 'data', 'ccle_abundances.csv',
-            ), index_col=[0]).T
-
-            cobj = next(
-                o
-                for o in obj._objectives
-                if len(o.edatas) == 1
-                and len(o.edatas[0].fixedParameters) == 1
-            )
-
-            sim_ref = cobj([
-                val if name.endswith('_phi')
-                else np.log10(val)
-                for val, name in zip(par, cobj.x_names)
-            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
-
-            pERK_ref = (sim_ref.y[
-                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
-            ] - par[obj.x_names.index('pERK_IF_offset')]) \
-                / par[obj.x_names.index('pERK_IF_scale')]
-
-            diff = ccle_abundances.HT29 - ccle_abundances.A375
-
-            aliases = {
-                'CRAF': ['RAF1'],
-                'ERK': ['MAPK1', 'MAPK3'],
-                'MEK': ['MAP2K1', 'MAP2K2'],
-                'mDUSP': ['mDUSP4', 'mDUSP6'],
-                'mSPRY': ['mSPRY2', 'mSPRY4'],
-                'DUSP': ['DUSP4', 'DUSP6'],
-                'SPRY': ['SPRY2', 'SPRY4'],
-                'RAS': ['HRAS', 'KRAS', 'NRAS'],
-            }
-
-            for ix, xname in enumerate(obj.x_names):
-                if xname.endswith('_0'):
-                    x_diff = diff[
-                        aliases.get(xname[:-2], [xname[:-2]])
-                    ].mean()
-                else:
-                    continue
-
-                par_diff = np.exp(x_diff)
-                print(f'multiplying parameter {xname} by {par_diff} for '
-                      f'cell line ht29')
-                par[ix] *= par_diff
-
-            par[obj.x_names.index('DUSP_eq')] /= 1000
-
-            sim_mod = cobj([
-                val if name.endswith('_phi')
-                else np.log10(val)
-                for val, name in zip(par, cobj.x_names)
-            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
-
-            pERK_mod = (sim_mod.y[
-                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
-            ] - par[obj.x_names.index('pERK_IF_offset')]) \
-                / par[obj.x_names.index('pERK_IF_scale')]
-
-            for ix, xname in enumerate(obj.x_names):
-                if xname.endswith('_eq'):
-                    gene_name = xname[:-3].replace("m", "")
-                    kM = par[obj.x_names.index(
-                        f'synthesize_ERKphosphop_{gene_name}_ERK_kM'
-                    )]
-                    gexprfactor = (pERK_ref / (pERK_ref + kM)) / (
-                                pERK_mod / (pERK_mod + kM))
-
-                    if xname.startswith('m'):
-                        x_diff = diff[
-                            aliases.get(xname[:-3], [xname[:-3]])
-                        ].mean() + gexprfactor
-                    else:
-                        x_diff = diff[
-                            aliases.get(xname[:-3], [xname[:-3]])
-                        ].mean() + gexprfactor
-
-                else:
-                    continue
-
-                print(f'multiplying parameter {xname} by {np.exp(x_diff)} for '
-                      f'cell line ht29')
-                par[ix] *= np.exp(x_diff)
-
-            crdata = cobj([
-                    val if name.endswith('_phi')
-                    else np.log10(val)
-                    for val, name in zip(par, obj.x_names)
-            ], sensi_orders=(0,), return_dict=True)['rdatas']
-
-            par[obj.x_names.index('pERK_IF_scale')] *= (
-                1 - par[obj.x_names.index('pERK_IF_offset')]
-            ) / (crdata[0].y[
-                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
-            ] - par[obj.x_names.index('pERK_IF_offset')])
-
     else:
         par = [par_dict[name] for name in obj.x_names]
 
