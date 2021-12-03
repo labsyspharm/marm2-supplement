@@ -14,10 +14,7 @@ par, model, solver, full_name = load_model_solver(
     settings, rafi='Vemurafenib', mods='channel_monoobs'
 )
 
-(
-    pysb_model, observable, expression, pattern_abundance, reaction_flux,
-    pattern_flux, rule_flux
-) = load_model_aux(full_name)
+pysb_model, observable = load_model_aux(full_name)
 
 model.setFixedParameterByName('EGF_0', 100.0)
 model.setFixedParameterByName('RAFi_0', 10.0)

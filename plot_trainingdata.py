@@ -243,19 +243,23 @@ tp_obs = [o for o in t_obs if not o.startswith('tm')]
 tm_obs = [o for o in t_obs if o.startswith('tm')]
 
 plot_simdata_wrap(
-    df_data_obs.query('time == 0').query('EGFR_crispr == 1.0'),
-    df_sim_obs.query('time == 0').query('EGFR_crispr == 1.0'),
-    tp_obs, rafi_0, rafi_label, 'log_{10}(protein abundance) [molecules/cell]',
-    ylimits=(-1, 13), logy=False, height_scale=0.5,
+    df_data_obs.query('time == 0').query('EGFR_crispr == 1.0').query(
+        't_presim == 0.0'),
+    df_sim_obs.query('time == 0').query('EGFR_crispr == 1.0').query(
+        't_presim == 0.0'),
+    tp_obs, rafi_0, rafi_label, 'log10(protein abundance) [molecules/cell]',
+    ylimits=(5, 13), logy=False, height_scale=0.5,
     figdir=figdir,
     filename=f'training_proteomics_dr{rafi}.pdf'
 )
 
 plot_simdata_wrap(
-    df_data_obs.query('time == 0').query('EGFR_crispr == 1.0'),
-    df_sim_obs.query('time == 0').query('EGFR_crispr == 1.0'),
-    tm_obs, rafi_0, rafi_label, 'log_{10}(transcript abundance) [FPKM]',
-    ylimits=(0, 7), logy=False, height_scale=0.5,
+    df_data_obs.query('time == 0').query('EGFR_crispr == 1.0').query(
+        't_presim == 0.0'),
+    df_sim_obs.query('time == 0').query('EGFR_crispr == 1.0').query(
+        't_presim == 0.0'),
+    tm_obs, rafi_0, rafi_label, 'log10(transcript abundance) [FPKM]',
+    ylimits=(1, 6), logy=False, height_scale=0.5,
     figdir=figdir,
     filename=f'training_transcriptomics_dr{rafi}.pdf'
 )
@@ -265,8 +269,8 @@ plot_simdata_wrap(
         'EGF_0 == 100').query('t_presim == 0.0'),
     df_sim_obs.query(f'{rafi_0} == 1.0').query('EGFR_crispr == 1.0').query(
         'EGF_0 == 100').query('t_presim == 0.0'),
-    tm_obs, 'time', TIMELABEL, 'log_{10}(transcript abundance) [FPKM]',
-    ylimits=(0, 7), xlimits=(0, 10), logy=False, logx=False, height_scale=0.5,
+    tm_obs, 'time', TIMELABEL, 'log10(transcript abundance) [FPKM]',
+    ylimits=(1, 6), xlimits=(0, 10), logy=False, logx=False, height_scale=0.5,
     figdir=figdir,
     filename=f'training_transcriptomics_tc.pdf'
 )
