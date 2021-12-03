@@ -5,6 +5,7 @@ from MARM.paths import (
 	get_analysis_results_file, get_parameters_file, get_figure_dir
 )
 from MARM.estimation import RAFI, PANRAFI, MEKI
+from MARM.analysis import N_RUNS
 from MARM.read_data import (
 	DATAFILES_ESTIMATION, DATAFILES_PREDICTION_COMBO, DATAFILES_PANRAFCOMBO,
 	DATAFILES_PREDICTION_SINGLE, DATAFILES_MUTRAS_ENGINEERED,
@@ -69,7 +70,7 @@ def get_instances_mutras(wildcards, modifications=None):
 	]
 
 JOBS = [str(i) for i in range(int(os.environ['N_JOBS']))]
-AJOBS = [f'{i:03}' for i in range(int(os.environ['N_JOBS']))]
+AJOBS = [f'{i:03}' for i in range(int(N_RUNS))]
 MS_PER_JOB = os.environ.get('MS_PER_JOB', 0)
 N_THREADS = int(os.environ.get('N_THREADS', 0))
 

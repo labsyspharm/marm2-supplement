@@ -80,13 +80,10 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
             'EGF_EGFR_MEKi_RAFi_comboprediction',
         'panrafcomboprediction':
             'EGF_EGFR_MEKi_RAFi_panrafcomboprediction',
-        'mutRASprediction_acquired':
-            'MEKi_RAFi_acquired_mutrasprediction',
         'mutRASprediction_engineered':
             'MEKi_RAFi_engineered_mutrasprediction',
         'mutRASprediction_engineered_combo':
             'MEKi_RAFi_engineered_mutrascomboprediction',
-        'ht29': 'EGF_EGFR_MEKi_RAFi_ht29'
     }
     model_variant = {
         'trainingdata': sxs['variant'],
