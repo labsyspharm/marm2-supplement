@@ -36,53 +36,53 @@ df_sim_melt = average_over_par_index(df_sim_obs, groupvars)
 df_melt = pd.concat([df_sim_melt, df_data_obs[groupvars + ['value']]])
 df_melt = df_melt[df_melt.time == 8.0]
 
-drugb = 'Cobimetinib'
-drugb_0 = f'{drugb}_0'
-drugb_label = f'{drugb.replace("_", "")} [$\mu$M]'
+for drugb in ['Vemurafenib', 'Cobimetinib']:
+    drugb_0 = f'{drugb}_0'
+    drugb_label = f'{drugb.replace("_", "")} [$\mu$M]'
 
-df_combo = df_melt.copy()
-if drugb == 'Vemurafenib':
-    df_combo = df_combo[
-        df_combo['Cobimetinib_0'] == drug_zero['Cobimetinib']
-    ]
-else:
-    df_combo = df_combo[
-        df_combo['Vemurafenib_0'] == drug_zero['Vemurafenib']
-    ]
+    df_combo = df_melt.copy()
+    if drugb == 'Vemurafenib':
+        df_combo = df_combo[
+            df_combo['Cobimetinib_0'] == drug_zero['Cobimetinib']
+        ]
+    else:
+        df_combo = df_combo[
+            df_combo['Vemurafenib_0'] == drug_zero['Vemurafenib']
+        ]
 
-for obs, zlabel, zlims, cmap, id in zip(
-        ['pERK_IF_obs', 'gtpRAS_obs', 'tDUSP_obs'],
-        [IFLABEL, RASLABEL, DUSPLABEL],
-        [(0, 1.2), (0, 5e3), (0, 1e4)],
-        ['viridis', 'inferno', 'plasma'],
-        ['pERK', 'RASgtp', 'tDUSP']
-):
-    plot_simdata_heatmap(
-        df_combo,
-        [obs], drugb_0, drugb_label, prafi_0, prafi_label, zlabel,
-        logx=True, logy=True, rows='EGF_0', zlims=zlims, cmap=cmap,
-        figdir=figdir,
-        filename=f'doseresponse_{prafi}_{drugb}_EGFRa_{id}.pdf',
-    )
+    for obs, zlabel, zlims, cmap, id in zip(
+            ['pERK_IF_obs', 'gtpRAS_obs', 'tDUSP_obs'],
+            [IFLABEL, RASLABEL, DUSPLABEL],
+            [(0, 1.2), (0, 5e3), (0, 1e4)],
+            ['viridis', 'inferno', 'plasma'],
+            ['pERK', 'RASgtp', 'tDUSP']
+    ):
+        plot_simdata_heatmap(
+            df_combo,
+            [obs], drugb_0, drugb_label, prafi_0, prafi_label, zlabel,
+            logx=True, logy=True, rows='EGF_0', zlims=zlims, cmap=cmap,
+            figdir=figdir,
+            filename=f'doseresponse_{prafi}_{drugb}_EGFRa_{id}.pdf',
+        )
 
-df_edata = df[df.datatype == 'data'].copy()
-df_rdata = df[df.datatype == 'simulation'].copy()
+    df_edata = df[df.datatype == 'data'].copy()
+    df_rdata = df[df.datatype == 'simulation'].copy()
 
-for frame in [df_edata, df_rdata]:
-    for drug_0, name in zip([prafi_0, drugb_0], [prafi, drugb]):
-        frame.loc[frame[drug_0] == drug_zero[name], drug_0] = 0.0
+    for frame in [df_edata, df_rdata]:
+        for drug_0, name in zip([prafi_0, drugb_0], [prafi, drugb]):
+            frame.loc[frame[drug_0] == drug_zero[name], drug_0] = 0.0
 
-for measure in ['bliss', 'hsa']:
-    plot_synergies(df_edata, df_rdata, kind=measure,
-                   rafi_0=prafi_0, meki_0=drugb_0)
+    for measure in ['bliss', 'hsa']:
+        plot_synergies(df_edata, df_rdata, kind=measure,
+                       rafi_0=prafi_0, meki_0=drugb_0)
+        plt.savefig(os.path.join(
+            figdir, f'{prafi}_{drugb}_{measure}_EGFRa.pdf')
+        )
+
+    plot_isobolograms(df_edata, df_rdata, rafi_0=prafi_0, meki_0=drugb_0,
+                      vmax=1.2)
     plt.savefig(os.path.join(
-        figdir, f'{prafi}_{drugb}_{measure}_EGFRa.pdf')
+        figdir, f'{prafi}_{drugb}_isobolograms_EGFRa.pdf')
     )
 
-plot_isobolograms(df_edata, df_rdata, rafi_0=prafi_0, meki_0=drugb_0,
-                  vmax=1.2)
-plt.savefig(os.path.join(
-    figdir, f'{prafi}_{drugb}_isobolograms_EGFRa.pdf')
-)
-
-write_timestamp(figdir, 'panrafcomboprediction')
+    write_timestamp(figdir, 'panrafcomboprediction')

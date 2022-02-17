@@ -1,4 +1,14 @@
 
 .idea/*
 *.json
+*.pyc
 */.DS_Store
+.snakemake/*
+MARM.egg-info/*
+*/__pycache__/*
+MARM/bngl/*
+MARM/build/*
+MARM/observables/*
+MARM/pysb_flat/*
+.ipynb_checkpoints/*
+*.pdf

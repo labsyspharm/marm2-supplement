@@ -21,7 +21,6 @@ model = get_model(sxs['model_name'], 'nrasq61mut', sxs['dataset'],
                   'channel_monoobs')
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
 
-
 cell_line = 'engineered'
 YLIM = (-0.15, 2.25)
 
@@ -154,13 +153,14 @@ for druga in ['Vemurafenib', 'LY3009120']:
         fixdrug = 'Vemurafenib'
         drugfix = 1.0
 
-    plot_simdata_heatmap(
-        df_melt[df_melt[f'{fixdrug }_0'] == drugfix],
-        ['pERK_IF_obs'], drugb_0, drugb_label, druga_0, druga_label, IFLABEL,
-        logx=True, logy=True, rows='NRAS_Q61mut', zlims=(0, 1.2),
-        cmap='viridis', figdir=figdir,
-        filename=f'doseresponse_{druga}_{drugb}_NRASQ61K_pERK.pdf',
-    )
+    for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
+        plot_simdata_heatmap(
+            df_melt[df_melt[f'{fixdrug }_0'] == drugfix],
+            [marker], drugb_0, drugb_label, druga_0, druga_label, IFLABEL,
+            logx=True, logy=True, rows='NRAS_Q61mut', zlims=(0, 1.2),
+            cmap='viridis', figdir=figdir,
+            filename=f'doseresponse_{druga}_{drugb}_NRASQ61K_{marker}.pdf',
+        )
 
     df_edata = df[(df.datatype == 'data') &
                   (df[f'{fixdrug}_0'] == drugfix)]

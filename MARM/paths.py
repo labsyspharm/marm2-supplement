@@ -79,8 +79,9 @@ def get_analysis_results_file(model, variant, dataset, basename, index):
 
 
 def get_parameters_file(model, variant, dataset):
-    return os.path.join(get_directory(), 'parameters',
-                        f'{model}_{variant}_{dataset}.csv')
+    par_dir = os.path.join(get_directory(), 'parameters')
+    os.makedirs(par_dir, exist_ok=True)
+    return os.path.join(par_dir, f'{model}_{variant}_{dataset}.csv')
 
 
 def get_model_module_file_instance(name, variant, instance,

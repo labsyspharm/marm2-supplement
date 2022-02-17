@@ -30,8 +30,10 @@ def read_settings(argv, index=True, threads=True):
     return s
 
 
-def load_model_solver(s, rafi=None, meki=None, mods=None):
+def load_model_solver(s, prafi=None, rafi=None, meki=None, mods=None):
     instance_vars = ['EGF']
+    if prafi is not None:
+        instance_vars.append('PRAFi')
     if rafi is not None:
         instance_vars.append('RAFi')
     if meki is not None:
@@ -44,7 +46,7 @@ def load_model_solver(s, rafi=None, meki=None, mods=None):
     solver = get_solver(model)
     solver.setSensitivityOrder(amici.SensitivityOrder_none)
 
-    par = load_parameters(model, s, rafi, meki, index=s['index'])
+    par = load_parameters(model, s, prafi, rafi, meki, index=s['index'])
     return par, model, solver, full_name
 
 
@@ -70,20 +72,22 @@ def extend_datapoints(e, tps):
     e.setObservedDataStdDev(new_data_std.flatten())
 
 
-def run_and_store_simulation(sxs, filename, par_dict=None):
+def run_and_store_simulation(sxs, filename, par_dict=None,
+                             channel_specific_dusp_binding=False):
     datasets = {
         'trainingdata': sxs['dataset'],
         'finepulse': sxs['dataset'],
         'singleprediction':
-            'EGF_EGFR_MEKi_RAFi_singleprediction',
+            'EGF_EGFR_MEKi_PRAFi_RAFi_singleprediction',
         'comboprediction':
-            'EGF_EGFR_MEKi_RAFi_comboprediction',
+            'EGF_EGFR_MEKi_PRAFi_RAFi_comboprediction',
         'panrafcomboprediction':
-            'EGF_EGFR_MEKi_RAFi_panrafcomboprediction',
+            'EGF_EGFR_MEKi_PRAFi_RAFi_panrafcomboprediction',
         'mutRASprediction_engineered':
-            'MEKi_RAFi_engineered_mutrasprediction',
+            'MEKi_PRAFi_RAFi_engineered_mutrasprediction',
         'mutRASprediction_engineered_combo':
-            'MEKi_RAFi_engineered_mutrascomboprediction',
+            'MEKi_PRAFi_RAFi_engineered_mutrascomboprediction',
+        'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
     model_variant = {
         'trainingdata': sxs['variant'],
@@ -93,16 +97,126 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
         'panrafcomboprediction': sxs['variant'],
         'mutRASprediction_engineered': 'nrasq61mut',
         'mutRASprediction_engineered_combo': 'nrasq61mut',
+        'ht29': sxs['variant']
     }
+    if channel_specific_dusp_binding:
+        modifications = 'channelcf_monoobs'
+    else:
+        modifications = 'channel_monoobs'
     obj = get_objective(sxs['model_name'], model_variant[filename],
                         sxs['dataset'], sxs['threads'],
-                        multimodel=True, modifications='channel_monoobs',
+                        multimodel=True, modifications=modifications,
                         datafile=datasets[filename])
     if par_dict is None:
         df_parameters = load_parameters_as_dataframe(sxs['model_name'],
                                                      sxs['variant'],
                                                      sxs['dataset'])
         par = df_parameters.loc[sxs['index'], obj.x_names].values
+
+        if filename == 'ht29':
+            ccle_abundances = pd.read_csv(os.path.join(
+                get_directory(), 'data', 'ccle_abundances.csv',
+            ), index_col=[0]).T
+
+            # find control condition (3 params are volume/EGF mol weight and
+            # avogadro constant)
+            cobj = next(
+                o
+                for o in obj._objectives
+                if len(o.edatas) == 1
+                and len(o.edatas[0].fixedParameters) == 3
+            )
+
+            # simulate control condition
+            sim_ref = cobj([
+                val if name.endswith('_phi')
+                else np.log10(val)
+                for val, name in zip(par, cobj.x_names)
+            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
+
+            # simulate control conditions, correct for offset & scaling
+            pERK_ref = (sim_ref.y[
+                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
+            ] - par[obj.x_names.index('pERK_IF_offset')]) \
+                / par[obj.x_names.index('pERK_IF_scale')]
+
+            diff = ccle_abundances.HT29 - ccle_abundances.A375
+
+            aliases = {
+                'CRAF': ['RAF1'],
+                'ERK': ['MAPK1', 'MAPK3'],
+                'MEK': ['MAP2K1', 'MAP2K2'],
+                'mDUSP': ['mDUSP4', 'mDUSP6'],
+                'mSPRY': ['mSPRY2', 'mSPRY4'],
+                'DUSP': ['DUSP4', 'DUSP6'],
+                'SPRY': ['SPRY2', 'SPRY4'],
+                'RAS': ['HRAS', 'KRAS', 'NRAS'],
+            }
+
+            for ix, xname in enumerate(obj.x_names):
+                if xname.endswith('_0'):
+                    x_diff = diff[
+                        aliases.get(xname[:-2], [xname[:-2]])
+                    ].mean()
+                else:
+                    continue
+
+                par_diff = np.exp(x_diff)
+                print(f'multiplying parameter {xname} by {par_diff} for '
+                      f'cell line ht29')
+                par[ix] *= par_diff
+
+            par[obj.x_names.index('DUSP_eq')] /= 1000
+
+            sim_mod = cobj([
+                val if name.endswith('_phi')
+                else np.log10(val)
+                for val, name in zip(par, cobj.x_names)
+            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
+
+            pERK_mod = (sim_mod.y[
+                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
+            ] - par[obj.x_names.index('pERK_IF_offset')]) \
+                / par[obj.x_names.index('pERK_IF_scale')]
+
+            for ix, xname in enumerate(obj.x_names):
+                if xname.endswith('_eq'):
+                    gene_name = xname[:-3].replace("m", "")
+                    kM = par[obj.x_names.index(
+                        f'synthesize_ERKphosphop_{gene_name}_ERK_kM'
+                    )]
+                    # correct for difference in baseline pERK
+                    gexprfactor = (pERK_ref / (pERK_ref + kM)) / (
+                                pERK_mod / (pERK_mod + kM))
+
+                    if xname.startswith('m'):
+                        x_diff = diff[
+                            aliases.get(xname[:-3], [xname[:-3]])
+                        ].mean() + gexprfactor
+                    else:
+                        x_diff = diff[
+                            aliases.get(xname[:-3], [xname[:-3]])
+                        ].mean() + gexprfactor
+
+                else:
+                    continue
+
+                print(f'multiplying parameter {xname} by {np.exp(x_diff)} for '
+                      f'cell line ht29')
+                par[ix] *= np.exp(x_diff)
+
+            crdata = cobj([
+                    val if name.endswith('_phi')
+                    else np.log10(val)
+                    for val, name in zip(par, obj.x_names)
+            ], sensi_orders=(0,), return_dict=True)['rdatas']
+
+            par[obj.x_names.index('pERK_IF_scale')] *= (
+                1 - par[obj.x_names.index('pERK_IF_offset')]
+            ) / (crdata[0].y[
+                0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
+            ] - par[obj.x_names.index('pERK_IF_offset')])
+
     else:
         par = [par_dict[name] for name in obj.x_names]
 
@@ -155,21 +269,21 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
             ).group(1)
             if f'bind_{inh}_{target}_kD' in mapping.map_sim_var
             else None
-            for inh, target in zip(['RAFi', 'MEKi'],
-                                   ['RAF', 'MEK'])
+            for inh, target in zip(['PRAFi', 'RAFi', 'MEKi'],
+                                   ['RAF', 'RAF', 'MEK'])
         ])
         for mapping in mappings
     ]
 
     dfs = []
-    for rdata, edata, model, (rafi, meki) in zip(rdatas, edatas, models,
+    for rdata, edata, model, (prafi, rafi, meki) in zip(rdatas, edatas, models,
                                                         drugs):
         df_rdata = amici.getSimulationObservablesAsDataFrame(model, edata,
                                                              rdata)
         df_edata = amici.getDataObservablesAsDataFrame(model, edata)
 
         df_instance = pd.concat([df_edata, df_rdata])
-        rename_and_fill_drug_columns(df_instance, rafi, meki)
+        rename_and_fill_drug_columns(df_instance, prafi, rafi, meki)
         for suffix in ['', '_preeq', '_presim']:
             colname = 'EGF_0' + suffix
             if colname not in df_instance.columns:
@@ -177,13 +291,15 @@ def run_and_store_simulation(sxs, filename, par_dict=None):
         dfs.append(df_instance)
 
     df = pd.concat(dfs)
+    if channel_specific_dusp_binding:
+        filename += '_cf'
     write_analysis_dataframe(df, sxs, filename)
 
 
-def rename_and_fill_drug_columns(df, rafi=None, meki=None):
+def rename_and_fill_drug_columns(df, prafi=None, rafi=None, meki=None):
     for suffix in ['', '_preeq', '_presim']:
-        for drug, init in zip([rafi, meki],
-                              ['RAFi_0', 'MEKi_0']):
+        for drug, init in zip([prafi, rafi, meki],
+                              ['PRAFi_0', 'RAFi_0', 'MEKi_0']):
             if drug is not None:
                 df.rename(
                     columns={f'{init}{suffix}': f'{drug}_0{suffix}'},
@@ -301,7 +417,7 @@ def get_obs_df(df, model):
     obs = list(model.getObservableNames())
     obs = [ob for ob in obs
            if ob not in [
-               'tEGF_obs', 'tRAFi_obs', 'tMEKi_obs', 'pMEK_obs',
+               'tEGF_obs', 'tRAFi_obs', 'tMEKi_obs', 'tPRAFi_obs', 'pMEK_obs',
            ]]
 
     # phosphorylated

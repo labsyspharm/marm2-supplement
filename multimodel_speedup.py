@@ -30,14 +30,16 @@ problem_single = get_problem(model_name, variant, dataset, 1,
                              multimodel=False)
 
 random.seed(index)
-x = pypesto.startpoint.uniform(
-    n_starts=1, lb=problem_multi.lb, ub=problem_multi.ub,
-    x_guesses=problem_multi.x_guesses, objective=problem_multi.objective,
-)
-x = pypesto.startpoint.util.resample_startpoints(
-    x, problem_single, pypesto.startpoint.uniform
+
+sampler = pypesto.startpoint.UniformStartpoints(
+    check_fval=True, check_grad=False,
 )
 
+x = sampler.sample(
+    n_starts=1, lb=problem_multi.lb, ub=problem_multi.ub,
+)
+x = sampler.check_and_resample(x, problem_multi.lb, problem_multi.ub,
+                               problem_multi.objective)
 
 t_multi, fval_multi = time_objective(problem_multi.objective, x)
 print(f'multimodel: {t_multi}')

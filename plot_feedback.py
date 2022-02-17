@@ -28,7 +28,9 @@ mrna_obs = ['tmDUSP_obs', 'tmSPRY_obs', 'tmEGFR_obs']
 abundance_obs = mrna_obs + prot_obs
 
 
-for condition in ['observed', 'preequilibration', 'log', 'egfra']:
+dfs = []
+for condition in ['observed', 'preequilibration', 'log', 'egfra',
+                  'egfra_long']:
     df = read_analysis_dataframe(sxs, f'feedback_analysis_{condition}', 0)
 
     abundance_entries = []
@@ -36,19 +38,19 @@ for condition in ['observed', 'preequilibration', 'log', 'egfra']:
         try:
             df = read_analysis_dataframe(sxs,
                                          f'feedback_analysis_{condition}', index)
-            times = [time for time in df.time.unique()]
+            df['par_index'] = index
             abundance_entries += [
-                df[(df.time == time)][
-                    abundance_obs
-                ].max().append(pd.Series({'time': time, 'par_index': index}))
-                for time in times
+                df[
+                    abundance_obs + ['pERK_IF_obs', 'Vemurafenib_0', 'time', 'par_index']
+                ]
             ]
         except FileNotFoundError:
             print(f'missing data for index {index}')
 
-    abundances = pd.DataFrame(abundance_entries)
+    abundances = pd.concat(abundance_entries, ignore_index=True)
+
     df = pd.melt(abundances,
-                 id_vars=['time', 'par_index'],
+                 id_vars=['time', 'par_index', 'pERK_IF_obs', 'Vemurafenib_0'],
                  value_vars=abundance_obs)
 
     df.variable = pd.Categorical(
@@ -58,9 +60,8 @@ for condition in ['observed', 'preequilibration', 'log', 'egfra']:
     ])
     df.value = df.value.apply(np.exp)
 
-    print(df)
     plot = (
-        ggplot(df,
+        ggplot(df[df.Vemurafenib_0 == 1.0],
                aes(x='time', y='value', group='variable', color='variable',
                    fill='variable'))
         + stat_summary(fun_y=np.median, geom='line', size=1)
@@ -86,5 +87,55 @@ for condition in ['observed', 'preequilibration', 'log', 'egfra']:
 
     plot_and_save_fig(plot, figdir,
                       f'feedback_abundances_{condition}.pdf')
+
+    df['condition'] = condition
+    if condition == 'egfra':
+        dfs.append(df[df.time == 8.0])
+    if condition == 'preequilibration':
+        dfs.append(df[df.time == df.time.max()])
+    if condition == 'observed':
+        tt = df.time.unique()
+        five_min = tt[np.argmin(np.abs(tt - 0.083))]
+        dfs.append(df[df.time == five_min])
+
+df_all = pd.concat(dfs)
+df_all.condition = pd.Categorical(df_all.condition)
+df_all.variable = pd.Categorical(
+    df_all.variable, ordered=True, categories=prot_obs + mrna_obs
+)
+for condition in df_all.condition.unique():
+    lb_pERK, ub_pERK = df_all[df_all.condition == condition].pERK_IF_obs.quantile([0.01,0.99])
+    print(f'{condition}: {lb_pERK} - {ub_pERK} pERK')
+    df_all = df_all[(df_all.condition != condition) | ((df_all.pERK_IF_obs > lb_pERK) & (df_all.pERK_IF_obs < ub_pERK))]
+
+
+n_bins = 20
+plot = (
+        ggplot(df_all,
+               aes(x='pERK_IF_obs', y='value', group='condition',
+                   color='condition', fill='condition'))
+        + facet_wrap('variable', ncol=3, scales='free_y')
+        + stat_summary_bin(fun_y=np.median, geom='line', size=1,
+                           bins=n_bins)
+        + xlab('pERK level [au]')
+        + ylab('expression level [molecule/cell]')
+        + theme('minimal', figure_size=(PLOTNINE_FIGWIDTH ,
+                                        PLOTNINE_FIGWIDTH  * 2/3))
+        + scale_color_cmap_d(name='Dark2')
+        + scale_fill_cmap_d(name='Dark2')
+        + scale_y_log10()
+)
+
+for quantile_range in np.linspace(0.2, 0.8, 4):
+    up = 0.5 + quantile_range / 2
+    lp = 0.5 - quantile_range / 2
+    plot += stat_summary_bin(fun_y=np.median,
+                             fun_ymin=lambda x: np.quantile(x, lp),
+                             fun_ymax=lambda x: np.quantile(x, up),
+                             geom='ribbon', alpha=0.2, color=None,
+                             bins=n_bins)
+
+plot_and_save_fig(plot, figdir,
+                  f'feedback_pERK_phase_diagram.pdf')
 
 write_timestamp(figdir, 'feedback')

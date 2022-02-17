@@ -6,7 +6,10 @@ import numpy as np
 from .paths import get_parameters_file
 
 
-def specialise_par_name(name, rafi, meki):
+def specialise_par_name(name, panrafi, rafi, meki):
+
+    if panrafi is not None:
+        name = name.replace('PRAFi', panrafi)
 
     if rafi is not None:
         name = name.replace('RAFi', rafi)
@@ -17,7 +20,7 @@ def specialise_par_name(name, rafi, meki):
     return name
 
 
-def load_parameters(model, settings, rafi, meki, index=0,
+def load_parameters(model, settings, prafi, rafi, meki, index=0,
                     allow_missing_pars=False):
     scales = amici.parameterScalingFromIntVector([
         amici.ParameterScaling_none
@@ -31,10 +34,14 @@ def load_parameters(model, settings, rafi, meki, index=0,
 
     par = []
     for name in model.getParameterNames():
-        specialized_name = specialise_par_name(name, rafi, meki)
-        if specialized_name in df_parameters:
-            val = df_parameters.loc[index, specialized_name]
-            model.setParameterByName(name, val)
+        if specialise_par_name(name, prafi, rafi, meki) in df_parameters:
+            val = df_parameters.loc[index,
+                                    specialise_par_name(name, prafi, rafi,
+                                                        meki)]
+            model.setParameterByName(
+                name,
+                val
+            )
         elif allow_missing_pars:
             val = model.getParameterByName(name)
         else:

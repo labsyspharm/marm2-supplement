@@ -2,12 +2,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+
 from scipy.stats import pearsonr
-
-from .common import new_rc_params
-
-mpl.rcParams.update(new_rc_params)
 
 SEABORNE_FIGWIDTH = 15
 

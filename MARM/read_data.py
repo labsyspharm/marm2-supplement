@@ -20,6 +20,7 @@ DATAFILES_MUTRAS_ENGINEERED_COMBO = [
     '20200119_A375_NRASQ61K_matrix_pERK_DOX_RAFi_MEKi',
     '20200130_A375_NRASQ61K_matrix_pERK_DOX_RAFifixed_panRAFi_MEKi.xls'
 ]
+DATAFILES_HT29 = ['20200128_HT29_matrix_EGF_RAFi_MEKi']
 DATAFOLDER = os.path.join(os.path.dirname(MARM.__file__), 'data')
 
 pERK_IF_std = 0.2
@@ -692,8 +693,8 @@ def load_experiment(IDs):
             read_T_experiment(data, df, [spec])
 
         if ID in [*DATAFILES_PANRAFCOMBO,
-                  '20200119_A375_NRASQ61K_matrix_pERK_DOX_RAFi_MEKi',
-                  '20200130_A375_NRASQ61K_matrix_pERK_DOX_RAFifixed_panRAFi_MEKi.xls']:
+                  *DATAFILES_MUTRAS_ENGINEERED_COMBO,
+                  *DATAFILES_HT29]:
             if ID in DATAFILES_PANRAFCOMBO:
                 df = pd.read_excel(filename,
                                    sheet_name='pERK')
@@ -708,7 +709,8 @@ def load_experiment(IDs):
 
             for ir, row in df.iterrows():
                 egfr_crispr = 1.0 \
-                    if row.Cell_line in ['A375', 'A375_NRAS_Q61K_DOXind'] \
+                    if row.Cell_line in ['A375', 'HT29',
+                                         'A375_NRAS_Q61K_DOXind'] \
                     else pow(2,  3.2)
                 drug_a = row['Drug A']
                 drug_b = row['Drug B']
@@ -809,8 +811,9 @@ def load_experiment(IDs):
 def filter_experiments(data, instances):
     instances_lower = [instance.lower() for instance in instances]
     if 'rafi' not in instances_lower:
-        data = data[(data[[f'{drug}_0'
-                           for drug in RAFI + PANRAFI]] == 0).all(axis=1)]
+        data = data[(data[[f'{drug}_0' for drug in RAFI]] == 0).all(axis=1)]
+    if 'prafi' not in instances_lower:
+        data = data[(data[[f'{drug}_0' for drug in PANRAFI]] == 0).all(axis=1)]
     if 'meki' not in instances_lower:
         data = data[(data[[f'{drug}_0' for drug in MEKI]] == 0.0).all(axis=1)]
     if 'egf' not in instances_lower:
@@ -871,8 +874,7 @@ if __name__ == '__main__':
     elif 'ht29' in instances:
         data = load_experiment(DATAFILES_HT29)
     elif 'mutrastraining' in instances or 'mutrasprediction' in instances:
-        if 'engineered' in instances:
-            data = load_experiment(DATAFILES_MUTRAS_ENGINEERED)
+        data = load_experiment(DATAFILES_MUTRAS_ENGINEERED)
     elif 'mutrascomboprediction' in instances:
         data = load_experiment(DATAFILES_MUTRAS_ENGINEERED_COMBO)
     else:
@@ -880,4 +882,8 @@ if __name__ == '__main__':
 
     data = filter_experiments(data, instances)
     data.loc[data.time == 0.083, 'time'] = 0.0833
+    data['N_Avogadro'] = 6.02214076000000e+23
+    data['volume'] = 1.00000000000000e-12
+    data['m_Da_EGF'] = 6200.00000000000
+
     data.to_csv(os.path.join(DATAFOLDER, outfile))

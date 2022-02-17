@@ -17,6 +17,7 @@ import logging
 sxs = read_settings(sys.argv)
 cell_line = sys.argv[6]
 
+
 optim_options = {
     fides.Options.XTOL: 1e-12,
     fides.Options.GATOL: 1e-4,
@@ -32,7 +33,7 @@ df_parameters = load_parameters_as_dataframe(sxs['model_name'],
                                              sxs['dataset'])
 
 problem = get_problem(sxs['model_name'], 'nrasq61mut',
-                      f'MEKi_RAFi_{cell_line}_mutrastraining',
+                      f'MEKi_PRAFi_RAFi_{cell_line}_mutrastraining',
                       sxs['threads'])
 
 free_pars = ['q61_RAS_gtp_kcat']
@@ -96,7 +97,5 @@ df_par.to_csv(file)
 run_and_store_simulation(sxs, f'mutRASprediction_{cell_line}',
                          par_dict=par_dict)
 
-if cell_line == 'engineered':
-    run_and_store_simulation(sxs, f'mutRASprediction_{cell_line}_combo',
-                             par_dict=par_dict)
-
+run_and_store_simulation(sxs, f'mutRASprediction_{cell_line}_combo',
+                         par_dict=par_dict)

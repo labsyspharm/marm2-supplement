@@ -14,7 +14,7 @@ par, model, solver, full_name = load_model_solver(
     settings, rafi='Vemurafenib', mods='channel_monoobs'
 )
 
-pysb_model, observable = load_model_aux(full_name)
+pysb_model, _ = load_model_aux(full_name)
 
 model.setFixedParameterByName('EGF_0', 100.0)
 model.setFixedParameterByName('RAFi_0', 10.0)
@@ -27,7 +27,7 @@ fp = list(edata_ref.fixedParameters)
 fp[model.getFixedParameterNames().index('EGF_0')] = 0.0
 edata_ref.fixedParametersPreequilibration = fp
 
-for cond in ['preequilibration', 'observed', 'log', 'egfra']:
+for cond in ['preequilibration', 'observed', 'log', 'egfra', 'egfra_long']:
     edata = amici.ExpData(edata_ref)
 
     if cond == 'preequilibration':
@@ -48,12 +48,42 @@ for cond in ['preequilibration', 'observed', 'log', 'egfra']:
         edata.setTimepoints(np.logspace(-7, 2, 51))
 
     if cond == 'egfra':
-        model.setFixedParameterByName('EGFR_crispr', 9.19)
+        fp = list(edata.fixedParameters)
+        fp[model.getFixedParameterNames().index('EGFR_crispr')] = 9.19
+        edata.fixedParameters = fp
+
+        fp = list(edata.fixedParametersPreequilibration)
+        fp[model.getFixedParameterNames().index('EGFR_crispr')] = 9.19
+        edata.fixedParametersPreequilibration = fp
+
         edata.setTimepoints(np.linspace(0, 8, 51))
 
-    edatas = [edata]
+    if cond == 'egfra_long':
+        fp = list(edata.fixedParameters)
+        fp[model.getFixedParameterNames().index('EGFR_crispr')] = 9.19
+        edata.fixedParameters = fp
+
+        fp = list(edata.fixedParametersPreequilibration)
+        fp[model.getFixedParameterNames().index('EGFR_crispr')] = 9.19
+        edata.fixedParametersPreequilibration = fp
+        edata.setTimepoints(np.logspace(-7, 2, 51))
+
+    rafis = np.logspace(-4, 1, 51)
+    edatas = [
+        amici.ExpData(edata) for rafi in rafis
+    ]
+    for rafi, edata in zip(rafis, edatas):
+        fp = list(edata.fixedParameters)
+        fp[model.getFixedParameterNames().index('RAFi_0')] = rafi
+        edata.fixedParameters = fp
+
+        if cond != 'preequilibration':
+            fp = list(edata.fixedParametersPreequilibration)
+            fp[model.getFixedParameterNames().index('RAFi_0')] = rafi
+            edata.fixedParametersPreequilibration = fp
 
     # run simulations
+    print(f'Running simulations for condition {cond}')
     rdatas = amici.runAmiciSimulations(model, solver, edatas,
                                        num_threads=settings['threads'])
 

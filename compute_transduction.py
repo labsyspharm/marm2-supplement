@@ -13,10 +13,7 @@ import sys
 settings = read_settings(sys.argv)
 
 drug_name = sys.argv[6]
-if len(sys.argv) > 7:
-    perturbations = sys.argv[7]
-else:
-    perturbations = ''
+perturbations = ''
 
 drugs = {
     'Vemurafenib': {
@@ -83,27 +80,6 @@ for genereg_feedback in ['SPRY', 'DUSP', 'EGFR']:
         model.setParameterByName(
             f'synthesize_ERKphosphop_{genereg_feedback}_ERK_kM', 1e20
         )
-
-if 'SOS' in perturbations.split('_'):
-    model.setParameterByName('ep_SOS1S1134p_GRB2_deltaG', 1)
-
-if 'RAF1' in perturbations.split('_') and drug['type'] == 'rafi':
-    model.setParameterByName(f'ep_RAF_RAF_mod_RAFi_single_deltaG',
-                             1)
-
-if 'RAF2' in perturbations.split('_') and drug['type'] == 'rafi':
-    model.setParameterByName(f'ep_RAF_RAF_mod_RAFi_double_deltaG',
-                             1)
-
-if 'MEKe' in perturbations.split('_') and drug['type'] == 'meki':
-    model.setParameterByName(
-        f'ep_MEKphosphop_MEKi_deltaG', 1
-    )
-
-if 'MEKr' in perturbations.split('_') and drug['type'] == 'meki':
-    model.setParameterByName(
-        f'catalyze_RAFrafiNone_MEKmeki_MEKi_p_kcatr', 1
-    )
 
 
 model.setTimepoints([0] + list(np.logspace(-4, 1, 201)))

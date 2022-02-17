@@ -1,19 +1,17 @@
 import networkx as nx
 import itertools
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+
 import numpy as np
 import pandas as pd
 import matplotlib.animation
 import os
 from matplotlib.patches import ArrowStyle
 
-from .common import new_rc_params, plot_and_save_fig, process_rules, \
+from .common import plot_and_save_fig, process_rules, \
     get_rule_patterns
 
 from pysb.pattern import match_complex_pattern
-
-mpl.rcParams.update(new_rc_params)
 
 NETWORKX_FIGWIDTH = 15
 

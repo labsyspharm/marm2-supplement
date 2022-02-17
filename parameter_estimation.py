@@ -31,7 +31,6 @@ optimizer = pypesto.optimize.FidesOptimizer(
 problem = get_problem(model_name, variant, dataset, n_threads)
 
 optimize_options = pypesto.optimize.OptimizeOptions(
-    startpoint_resample=True,
     allow_failed_starts=True,
 )
 
@@ -47,13 +46,17 @@ history_options = pypesto.HistoryOptions(
     ),
     trace_save_iter=1
 )
+startpoints = pypesto.startpoint.UniformStartpoints(
+    check_fval=True, check_grad=True,
+)
 result = pypesto.optimize.minimize(
     problem,
     optimizer,
     n_starts=n_starts,
-    startpoint_method=pypesto.startpoint.uniform,
+    startpoint_method=startpoints,
     options=optimize_options,
-    history_options=history_options
+    history_options=history_options,
+    filename=None,
 )
 
 outdir = os.path.join(get_results_path(model_name, variant))

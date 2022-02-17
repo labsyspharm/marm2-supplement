@@ -5,7 +5,6 @@ import copy
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 from ..estimation import get_solver
 
@@ -13,14 +12,6 @@ from collections import Counter
 from scipy.constants import N_A
 from astropy import units
 from pysb.pattern import SpeciesPatternMatcher
-
-new_rc_params = {
-    "font.family": 'Helvetica',
-    "pdf.fonttype": 42,
-    'ps.fonttype': 42,
-    'svg.fonttype': 'none',
-}
-mpl.rcParams.update(new_rc_params)
 
 ATOL_MONO_FRACTIONS = 1e-12
 ATOL_FLUXES = 1e-10

@@ -18,7 +18,8 @@ from .paths import (get_model_instance_name, get_model_name_variant,
                     get_directory)
 
 CONSTANTS = [
-    'RAFi_0', 'MEKi_0', 'EGF_0', 'EGFR_crispr', 'NRAS_Q61mut',
+    'PRAFi_0', 'RAFi_0', 'MEKi_0', 'EGF_0', 'EGFR_crispr', 'NRAS_Q61mut',
+    'N_Avogadro', 'volume', 'm_Da_EGF',
 ]
 
 
@@ -36,10 +37,8 @@ def cleanup_unused(model):
 
     expression_dynamic_symbols = set()
     for sym in dynamic_eq.free_symbols:
-        if str(sym) in model.expressions.keys():
-            expression_dynamic_symbols |= model.expressions[
-                str(sym)
-            ].expand_expr().free_symbols
+        if isinstance(sym, pysb.Expression):
+            expression_dynamic_symbols |= sym.expand_expr().free_symbols
 
     initial_eq = sp.Matrix([
         initial.value.expand_expr()
@@ -79,6 +78,12 @@ def cleanup_unused(model):
 
     model.expressions = pysb.ComponentSet([
         expr for expr in model.expressions
+        if len(expr.expand_expr().free_symbols.intersection(unused_pars)) == 0
+        and not expr.name.startswith('_')
+    ])
+
+    model._derived_expressions = pysb.ComponentSet([
+        expr for expr in model._derived_expressions
         if len(expr.expand_expr().free_symbols.intersection(unused_pars)) == 0
         and not expr.name.startswith('_')
     ])
@@ -290,7 +295,7 @@ def add_monomer_label(model, monomer, name, label_site,
             rule_copy.name = f'{deact_rule}_{channel}'
             model.add_component(rule_copy)
         else:
-            model.rules[deact_rule].name = f'{deact_rule}_{channel}'
+            model.rules[deact_rule].rename(f'{deact_rule}_{channel}')
 
     return model
 
@@ -341,7 +346,7 @@ def propagate_monomer_label(model, source_monomer, target_monomer, name,
             rule_copy.name = f'{trans_rule}_{channel}'
             model.add_component(rule_copy)
         else:
-            model.rules[trans_rule].name = f'{trans_rule}_{channel}'
+            model.rules[trans_rule].rename(f'{trans_rule}_{channel}')
 
         if rem_rule in model.rules.keys():
             for cp in model.rules[rem_rule].reactant_pattern.complex_patterns + \
@@ -359,7 +364,7 @@ def propagate_monomer_label(model, source_monomer, target_monomer, name,
             rule_copy.name = f'{rem_rule}_{channel}'
             model.add_component(rule_copy)
         else:
-            model.rules[rem_rule].name = f'{rem_rule}_{channel}'
+            model.rules[rem_rule].rename(f'{rem_rule}_{channel}')
 
 
 def write_observable_function(model):
@@ -383,6 +388,29 @@ def write_observable_function(model):
                 f.write(f'        "{obs.name}": {sanitize(obs.expand_obs())},'
                         f'\n')
         f.write('    }\n')
+
+
+def update_monomer_in_cp(cp, mono):
+    for mp in cp.monomer_patterns:
+        if mp.monomer.name == mono.name:
+            mp.monomer = mono
+
+
+def update_monomer_in_cps(cps, mono):
+    for cp in cps:
+        update_monomer_in_cp(cp, mono)
+
+
+def update_monomer_patterns(model, mono):
+    for rule in model.rules:
+        for pattern in [rule.product_pattern, rule.reactant_pattern]:
+            update_monomer_in_cps(pattern.complex_patterns, mono)
+
+    for obs in model.observables:
+        update_monomer_in_cps(obs.reaction_pattern.complex_patterns, mono)
+
+    for init in model.initials:
+        update_monomer_in_cp(init.pattern, mono)
 
 
 def sanitize(sym):

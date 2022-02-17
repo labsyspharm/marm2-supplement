@@ -14,10 +14,7 @@ from MARM.estimation import RAFI, PANRAFI
 sxs = read_settings(sys.argv, index=False, threads=False)
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
 drug = sys.argv[4]
-if len(sys.argv) > 5:
-    perturbations = sys.argv[5]
-else:
-    perturbations = ''
+perturbations = ''
 
 drug_label = f'{drug.replace("_", "")} [$\mu$M]'
 df = read_all_analysis_dataframes(sxs,

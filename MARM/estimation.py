@@ -1,4 +1,3 @@
-import importlib
 import amici
 import amici.petab_objective
 import amici.parameter_mapping
@@ -9,7 +8,6 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
-import sys
 from .paths import (
     get_model_name_dataset, get_results_path, get_model_module_dir_dataset
 )
@@ -43,8 +41,7 @@ def get_solver(model):
 
 def get_instances(instance_vars):
     instance_vars = [var for var in instance_vars if
-                     var not in ['EGFR', 'mutrastraining', 'engineered',
-                                 'acquired']]
+                     var not in ['EGFR', 'mutrastraining', 'engineered']]
     instances = []
     for r in range(len(instance_vars) + 1):
         instances.extend(list(itertools.combinations(instance_vars, r)))
@@ -59,8 +56,8 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
 
     full_parameters = set()
     for param in full_model.getParameterIds():
-        for rafi, meki in itertools.product(RAFI + PANRAFI, MEKI):
-            full_parameters.add(specialise_par_name(param, rafi, meki))
+        for rafi, prafi, meki in itertools.product(RAFI, PANRAFI, MEKI):
+            full_parameters.add(specialise_par_name(param, prafi, rafi, meki))
     full_parameters = sorted(list(full_parameters))
 
     instance_vars = dataset.split('_')
@@ -86,6 +83,8 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                     map_sim_var={
                         model_param: specialise_par_name(
                             model_param,
+                            'LY3009120' if prafi is None and not multimodel
+                            else prafi,
                             'Vemurafenib' if rafi is None and not multimodel
                             else rafi,
                             'Cobimetinib' if meki is None and not multimodel
@@ -102,13 +101,13 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                         )
                     }
                 )
-                for rafi, meki, _ in edatas
+                for prafi, rafi, meki, _ in edatas
             ])
 
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
                 solver,
-                [e[2] for e in edatas],
+                [e[3] for e in edatas],
                 x_ids=full_parameters,
                 parameter_mapping=parameter_mapping,
                 max_sensi_order=None,
@@ -365,17 +364,9 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
     fixed_idx += [idx for idx, name in enumerate(names)
                   if name.endswith('_phi') and idx not in fixed_idx]
 
-    panraf_energies = [
-        'ep_RAF_RAF_mod_RAFi_double_deltaG'.replace('RAFi', rafi)
-        for rafi in PANRAFI
-    ]
-
     # paradox breaker
     fixed_vals.append(0.0)
     fixed_idx.append(names.index('ep_RAF_RAF_mod_PLX8394_single_deltaG'))
-
-    fixed_vals += [0.0 for _ in panraf_energies]
-    fixed_idx += [names.index(name) for name in panraf_energies]
 
     for val, idx in zip(fixed_vals, fixed_idx):
         print(f'fixing {names[idx]} to {val}')
@@ -494,11 +485,20 @@ def get_edata(dataset, instance, model):
 
     if 'rafi' not in instances:
         exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in RAFI + PANRAFI]] == 0).all(axis=1)
+            (exp_data[[f'{drug}_0' for drug in RAFI]] == 0).all(axis=1)
         ]
     else:
         exp_data = exp_data[
-            (exp_data[[f'{drug}_0' for drug in RAFI + PANRAFI]] > 0).any(axis=1)
+            (exp_data[[f'{drug}_0' for drug in RAFI]] > 0).any(axis=1)
+        ]
+
+    if 'prafi' not in instances:
+        exp_data = exp_data[
+            (exp_data[[f'{drug}_0' for drug in PANRAFI]] == 0).all(axis=1)
+        ]
+    else:
+        exp_data = exp_data[
+            (exp_data[[f'{drug}_0' for drug in PANRAFI]] > 0).any(axis=1)
         ]
 
     if 'meki' not in instances:
@@ -512,8 +512,8 @@ def get_edata(dataset, instance, model):
 
     if len(exp_data):
         edatas_labeled = []
-        for rafi, meki in itertools.product(
-                RAFI + PANRAFI + [None], MEKI + [None]
+        for prafi, rafi, meki in itertools.product(
+                PANRAFI + [None], RAFI + [None], MEKI + [None]
         ):
             combo_data = exp_data[
                 pd.concat([
@@ -523,13 +523,13 @@ def get_edata(dataset, instance, model):
                         exp_data[f'{drug_zero}_0'] == 0
                         for drug_zero in zero_drugs
                     ], axis=1).all(axis=1)
-                    for drug, zero_drugs in zip([rafi, meki],
-                                                [RAFI + PANRAFI, MEKI])
+                    for drug, zero_drugs in zip([prafi, rafi, meki],
+                                                [PANRAFI, RAFI, MEKI])
                 ], axis=1).all(axis=1)
             ]
             for suffix in ['', '_preeq', '_presim']:
-                for drug, drug_init in zip([rafi, meki],
-                                           ['RAFi_0', 'MEKi_0']):
+                for drug, drug_init in zip([prafi, rafi, meki],
+                                           ['PRAFi_0', 'RAFi_0', 'MEKi_0']):
                     if drug is None:
                         val = 0.0
                     else:
@@ -540,7 +540,7 @@ def get_edata(dataset, instance, model):
                 edatas = amici.getEdataFromDataFrame(model, combo_data)
                 for edata in edatas:
                     edata.reinitializeFixedParameterInitialStates = True
-                    edatas_labeled.append((rafi, meki, edata))
+                    edatas_labeled.append((prafi, rafi, meki, edata))
 
         return edatas_labeled
     else:

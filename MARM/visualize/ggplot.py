@@ -2,7 +2,6 @@ from plotnine import *
 import mizani.formatters
 import mizani.transforms
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 import copy
 import amici
@@ -12,13 +11,11 @@ import pandas as pd
 import numpy as np
 import itertools
 
-from .common import new_rc_params, uM_to_molecules, molecules_to_uM
+from .common import uM_to_molecules, molecules_to_uM
 
 from MARM.estimation import RAFI, PANRAFI, MEKI
 
 from scipy.optimize import least_squares
-
-mpl.rcParams.update(new_rc_params)
 
 PLOTNINE_FIGWIDTH = 10
 
@@ -881,6 +878,10 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename):
         df_drug_free[dimers] = df_drug_free[dimers].div(
             df_drug_free[dimers].sum(axis=1), axis=0
         )
+
+        frac = df_drug_free[df_drug_free[iterator] ==
+                            df_drug_free[iterator].max()]['baseline_RRI']
+        print(f'{drug} RRI: {frac.mean()} +- {frac.std()}%')
 
         df_drug_free['drug_free_dimeric_raf'] = \
             df_drug_free['baseline_RR'] \

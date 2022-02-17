@@ -1,7 +1,9 @@
 import sys
 import pysb
-from MARM.paths import get_model_instance_name
+import copy
+
 import MARM
+from MARM.paths import get_model_instance_name
 
 model_name = sys.argv[1]
 variant = sys.argv[2]
@@ -9,7 +11,8 @@ variant = sys.argv[2]
 modifications = None
 if len(sys.argv) > 3:
     instance = sys.argv[3]
-    if 'channel' in instance.split('_') or 'monoobs' in instance.split('_'):
+    if any(mod in instance.split('_') for mod in ['channel', 'channelcf',
+                                                  'monoobs']):
         modifications = instance
         instance = ''
     if len(sys.argv) > 4:
@@ -21,6 +24,7 @@ INSTANCES = {
     'EGF': 'initEGF',
     'RAFi': 'initRAFi',
     'MEKi': 'initMEKi',
+    'PRAFi': 'initPRAFi',
 }
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
@@ -32,7 +36,7 @@ if modifications is None:
 else:
     modifications = modifications.split('_')
 
-if 'channel' in modifications:
+if 'channel' in modifications or 'channelcf' in modifications:
     MARM.model.add_monomer_label(
         model,
         'MEK',
@@ -75,6 +79,55 @@ if 'channel' in modifications:
             model.monomers['EGFR'](Tyr='p')
         )
     )
+
+    if 'channelcf' in modifications:
+        model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']
+        MARM.model.update_monomer_patterns(model, model.monomers['DUSP'])
+
+
+        def make_binding_channel_specific(rule, monomer, binding_site,
+                                          channel):
+            for pattern in [rule.rule_expression.reactant_pattern,
+                            rule.rule_expression.product_pattern]:
+                for cp in pattern.complex_patterns:
+                    for mp in cp.monomer_patterns:
+                        if mp.monomer.name == monomer \
+                                and binding_site in mp.site_conditions:
+                            mp.site_conditions[f'{binding_site}_{channel}'] = \
+                                mp.site_conditions.pop(binding_site)
+                        if mp.monomer.name == 'ERK' \
+                                and 'phospho' in mp.site_conditions \
+                                and mp.site_conditions['phospho'] == 'p':
+                            mp.site_conditions['channel'] = channel
+
+        for rule_name in ['DUSP_binds_pERK', 'DUSP_dissociates_from_ERK']:
+            onco_rule = model.rules[rule_name]
+            onco_rule.rename(onco_rule.name.replace('ERK', 'ERK_onco'))
+
+            phys_rule = copy.deepcopy(onco_rule)
+            phys_rule.name = phys_rule.name.replace('_onco', '_phys')
+            model.add_component(phys_rule)
+
+            for rule, channel in zip([onco_rule, phys_rule],
+                                     ['onco', 'phys']):
+                make_binding_channel_specific(rule, 'DUSP', 'erk', channel)
+
+        for rule_name, channel in zip(
+                ['DUSP_dephosphorylates_ERK_onco',
+                 'DUSP_dephosphorylates_ERK_phys'],
+                ['onco', 'phys']
+        ):
+            make_binding_channel_specific(
+                model.rules[rule_name], 'DUSP', 'erk', channel
+            )
+
+        rule = model.rules['synthesis_pDUSP']
+        for cp in rule.product_pattern.complex_patterns:
+            for mp in cp.monomer_patterns:
+                if mp.monomer.name == 'DUSP':
+                    condition = mp.site_conditions.pop('erk')
+                    mp.site_conditions['erk_onco'] = condition
+                    mp.site_conditions['erk_phys'] = condition
 
 if 'monoobs' in modifications:
     MARM.model.add_monomer_configuration_observables(model)

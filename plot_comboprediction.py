@@ -27,65 +27,6 @@ df_data_obs, df_sim_obs, if_obs, t_obs, p_obs, a_obs, drug_zero = \
     get_obs_df(df, model)
 
 
-plotspecs = [
-    {
-        'obs': 'pERK_IF_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'viridis',
-        'id': 'pERK',
-    },
-    {
-        'obs': 'pERK_onco_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'viridis',
-        'id': 'pERK_onc',
-    },
-    {
-        'obs': 'pERK_phys_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'viridis',
-        'id': 'pERK_phys',
-    },
-    {
-        'obs': 'pMEK_IF_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'plasma',
-        'id': 'pMEK',
-    },
-    {
-        'obs': 'pMEK_onco_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'plasma',
-        'id': 'pMEK_onc',
-    },
-    {
-        'obs': 'pMEK_phys_obs',
-        'label': IFLABEL,
-        'zlims': (0, 2),
-        'cmap': 'plasma',
-        'id': 'pMEK_phys',
-    },
-    {
-        'obs': 'gtpRAS_obs',
-        'label': RASLABEL,
-        'zlims': (0, 10),
-        'cmap': 'inferno',
-        'id': 'RASgtp',
-    },
-    {
-        'obs': 'tDUSP_obs',
-        'label': DUSPLABEL,
-        'zlims': (0, 10),
-        'cmap': 'plasma',
-        'id': 'tDUSP',
-    },
-]
-
 rafi = 'Vemurafenib'
 meki = 'Cobimetinib'
 rafi_0 = f'{rafi}_0'
@@ -98,6 +39,64 @@ for egfr_state, time, egfr_label in zip(
         [0.0833, 8],
         ['EGFRwt', 'EGFRa']
 ):
+    plotspecs = [
+        {
+            'obs': 'pERK_IF_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
+            'cmap': 'viridis',
+            'id': 'pERK',
+        },
+        {
+            'obs': 'pERK_onco_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
+            'cmap': 'viridis',
+            'id': 'pERK_onc',
+        },
+        {
+            'obs': 'pERK_phys_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
+            'cmap': 'viridis',
+            'id': 'pERK_phys',
+        },
+        {
+            'obs': 'pMEK_IF_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2),
+            'cmap': 'plasma',
+            'id': 'pMEK',
+        },
+        {
+            'obs': 'pMEK_onco_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2),
+            'cmap': 'plasma',
+            'id': 'pMEK_onc',
+        },
+        {
+            'obs': 'pMEK_phys_obs',
+            'label': IFLABEL,
+            'zlims': (0, 2),
+            'cmap': 'plasma',
+            'id': 'pMEK_phys',
+        },
+        {
+            'obs': 'gtpRAS_obs',
+            'label': RASLABEL,
+            'zlims': (0, 10),
+            'cmap': 'inferno',
+            'id': 'RASgtp',
+        },
+        {
+            'obs': 'tDUSP_obs',
+            'label': DUSPLABEL,
+            'zlims': (0, 10),
+            'cmap': 'plasma',
+            'id': 'tDUSP',
+        },
+    ]
 
     if egfr_label == 'EGFRwt':
         mode = 'peak'

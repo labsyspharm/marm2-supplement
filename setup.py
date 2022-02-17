@@ -8,9 +8,9 @@ setup(name='MARM',
       install_requires=[
             'numpy',
             'petab',
-            'amici==0.11.18',
-            'pypesto==0.2.7',
-            'fides==0.5.1',
+            'amici',
+            'pypesto==0.2.10',
+            'fides==0.7.5',
             'astropy',
             'mizani',
             'plotnine',
@@ -23,7 +23,9 @@ setup(name='MARM',
             'sklearn',
             'pysb@git+https://github.com/FFroehlich/pysb@energy_modeling',
             'scipy',
-            'networkx'
+            'networkx',
+            'jupyter',
+            'cite2c'
       ],
       python_requires='>=3.7',
       zip_safe=False)

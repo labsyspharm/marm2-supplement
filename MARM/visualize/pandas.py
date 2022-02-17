@@ -6,7 +6,6 @@ import itertools
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 import MARM
 
@@ -16,10 +15,8 @@ from .common import plot_and_save_fig, get_rule_modifies_site_state, \
 from .common import (
     check_mode, process_preequilibration, get_dose_response_edatas,
     process_rdata_doseresponse, process_rdata_timecourse,
-    get_figure_with_subplots, new_rc_params
+    get_figure_with_subplots
 )
-
-mpl.rcParams.update(new_rc_params)
 
 THRESHOLD_MONO_FRACTIONS = 0.025
 MAX_MONO_FRACTIONS = 10
