@@ -43,7 +43,7 @@ if 'channel' in modifications or 'channelcf' in modifications:
         'pMEK',
         ('phospho', 'p'),
         {
-            'onco': [
+            'mbraf': [
                 'BRAFV600E_phosphorylates_MEK_bound1',
                 'BRAFV600E_phosphorylates_MEK_bound2',
                 'BRAFV600E_phosphorylates_MEK_bound3',
@@ -53,12 +53,14 @@ if 'channel' in modifications or 'channelcf' in modifications:
                 'BRAFV600E_phosphorylates_MEK_unbound3',
                 'BRAFV600E_phosphorylates_MEK_unbound4',
             ],
-            'phys': [
+            'dbraf': [
                 'BRAF_BRAF_phosphorylates_MEK',
-                'CRAF_BRAF_phosphorylates_MEK',
                 'BRAF_CRAF_phosphorylates_MEK',
-                'CRAF_CRAF_phosphorylates_MEK'
             ],
+            'craf': [
+                'CRAF_BRAF_phosphorylates_MEK',
+                'CRAF_CRAF_phosphorylates_MEK'
+            ]
         },
         'MEK_is_dephosphorylated'
     )
@@ -67,11 +69,12 @@ if 'channel' in modifications or 'channelcf' in modifications:
         'MEK',
         'ERK',
         'pERK',
-        ['onco', 'phys'],
+        ['mbraf', 'dbraf', 'craf'],
         'pMEK_phosphorylates_ERK',
         'DUSP_dephosphorylates_ERK',
         ('phospho', 'p')
     )
+
     pysb.Expression(
         'activeEGFR_obs',
         pysb.Observable(
@@ -79,9 +82,24 @@ if 'channel' in modifications or 'channelcf' in modifications:
             model.monomers['EGFR'](Tyr='p')
         )
     )
+    pysb.Expression(
+        'BRAF_mono_obs',
+        pysb.Observable(
+            'monoBRAF',
+            model.monomers['BRAF'](raf=None)
+        )
+    )
+
+    pysb.Expression(
+        'BRAF_dimer_obs',
+        pysb.Observable(
+            'dimerBRAF',
+            model.monomers['BRAF'](raf=pysb.ANY)
+        )
+    )
 
     if 'channelcf' in modifications:
-        model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']
+        model.monomers['DUSP'].sites = ['erk_mbraf', 'erk_dbraf', 'erk_craf']
         MARM.model.update_monomer_patterns(model, model.monomers['DUSP'])
 
 
@@ -101,21 +119,26 @@ if 'channel' in modifications or 'channelcf' in modifications:
                             mp.site_conditions['channel'] = channel
 
         for rule_name in ['DUSP_binds_pERK', 'DUSP_dissociates_from_ERK']:
-            onco_rule = model.rules[rule_name]
-            onco_rule.rename(onco_rule.name.replace('ERK', 'ERK_onco'))
+            mbraf_rule = model.rules[rule_name]
+            mbraf_rule.rename(mbraf_rule.name.replace('ERK', 'ERK_mbraf'))
 
-            phys_rule = copy.deepcopy(onco_rule)
-            phys_rule.name = phys_rule.name.replace('_onco', '_phys')
-            model.add_component(phys_rule)
+            dbraf_rule = copy.deepcopy(mbraf_rule)
+            dbraf_rule.name = dbraf_rule.name.replace('_mbraf', '_dbraf')
+            model.add_component(dbraf_rule)
 
-            for rule, channel in zip([onco_rule, phys_rule],
-                                     ['onco', 'phys']):
+            craf_rule = copy.deepcopy(mbraf_rule)
+            craf_rule.name = craf_rule.name.replace('_mbraf', '_craf')
+            model.add_component(craf_rule)
+
+            for rule, channel in zip([mbraf_rule, dbraf_rule, craf_rule],
+                                     ['mbraf', 'dbraf', 'craf']):
                 make_binding_channel_specific(rule, 'DUSP', 'erk', channel)
 
         for rule_name, channel in zip(
-                ['DUSP_dephosphorylates_ERK_onco',
-                 'DUSP_dephosphorylates_ERK_phys'],
-                ['onco', 'phys']
+                ['DUSP_dephosphorylates_ERK_mbraf',
+                 'DUSP_dephosphorylates_ERK_dbraf',
+                 'DUSP_dephosphorylates_ERK_craf'],
+                ['mbraf', 'dbraf', 'craf']
         ):
             make_binding_channel_specific(
                 model.rules[rule_name], 'DUSP', 'erk', channel
@@ -126,8 +149,8 @@ if 'channel' in modifications or 'channelcf' in modifications:
             for mp in cp.monomer_patterns:
                 if mp.monomer.name == 'DUSP':
                     condition = mp.site_conditions.pop('erk')
-                    mp.site_conditions['erk_onco'] = condition
-                    mp.site_conditions['erk_phys'] = condition
+                    for channel in ['mbraf', 'dbraf', 'craf']:
+                        mp.site_conditions[f'erk_{channel}'] = condition
 
 if 'monoobs' in modifications:
     MARM.model.add_monomer_configuration_observables(model)
