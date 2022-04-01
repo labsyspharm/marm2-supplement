@@ -32,7 +32,7 @@ df_data_obs, df_sim_obs, if_obs, t_obs, p_obs, a_obs, drug_zeros = \
 for obs in if_obs:
     for index in range(N_RUNS):
         obs_name = obs.split('_')[0]
-        offset = df_sim_obs[(df_sim_obs.variable == f'{obs_name}_mbraf_obs') &
+        offset = df_sim_obs[(df_sim_obs.variable == f'{obs_name}_onco_obs') &
                             (df_sim_obs.datatype == 'simulation') &
                             (df_sim_obs.par_index == index)]
         if len(offset):
@@ -44,7 +44,7 @@ for obs in if_obs:
             par = pd.read_csv(par_file, index_col=0)
 
             offset = df_sim_obs[
-                (df_sim_obs.variable == f'{obs_name}_mbraf_obs') &
+                (df_sim_obs.variable == f'{obs_name}_onco_obs') &
                 (df_sim_obs.datatype == 'simulation') &
                 (df_sim_obs.par_index == index)
             ]
@@ -153,8 +153,7 @@ for druga in ['Vemurafenib', 'LY3009120']:
         fixdrug = 'Vemurafenib'
         drugfix = 1.0
 
-    for marker in ['pERK_IF_obs', 'pERK_mbraf_obs', 'pERK_dbraf_obs',
-                   'pERK_craf_obs']:
+    for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
         plot_simdata_heatmap(
             df_melt[df_melt[f'{fixdrug }_0'] == drugfix],
             [marker], drugb_0, drugb_label, druga_0, druga_label, IFLABEL,

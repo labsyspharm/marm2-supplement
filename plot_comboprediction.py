@@ -48,25 +48,18 @@ for egfr_state, time, egfr_label in zip(
             'id': 'pERK',
         },
         {
-            'obs': 'pERK_mbraf_obs',
+            'obs': 'pERK_onco_obs',
             'label': IFLABEL,
             'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
             'cmap': 'viridis',
-            'id': 'pERK_mbraf',
+            'id': 'pERK_onc',
         },
         {
-            'obs': 'pERK_dbraf_obs',
+            'obs': 'pERK_phys_obs',
             'label': IFLABEL,
             'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
             'cmap': 'viridis',
-            'id': 'pERK_dbraf',
-        },
-        {
-            'obs': 'pERK_craf_obs',
-            'label': IFLABEL,
-            'zlims': (0, 2.0) if egfr_label == 'EGFRwt' else (0, 1.2),
-            'cmap': 'viridis',
-            'id': 'pERK_carf',
+            'id': 'pERK_phys',
         },
         {
             'obs': 'pMEK_IF_obs',
@@ -76,25 +69,18 @@ for egfr_state, time, egfr_label in zip(
             'id': 'pMEK',
         },
         {
-            'obs': 'pMEK_mbraf_obs',
+            'obs': 'pMEK_onco_obs',
             'label': IFLABEL,
             'zlims': (0, 2),
             'cmap': 'plasma',
-            'id': 'pMEK_mbraf',
+            'id': 'pMEK_onc',
         },
         {
-            'obs': 'pMEK_dbraf_obs',
+            'obs': 'pMEK_phys_obs',
             'label': IFLABEL,
             'zlims': (0, 2),
             'cmap': 'plasma',
-            'id': 'pMEK_dbraf',
-        },
-        {
-            'obs': 'pMEK_craf_obs',
-            'label': IFLABEL,
-            'zlims': (0, 2),
-            'cmap': 'plasma',
-            'id': 'pMEK_craf',
+            'id': 'pMEK_phys',
         },
         {
             'obs': 'gtpRAS_obs',
@@ -209,11 +195,10 @@ for frame in [df_edata, df_rdata]:
         frame.loc[frame[drug_0] == drug_zero[name], drug_0] = 0.0
 
 for measure in ['bliss', 'hsa']:
-    for marker in ['pERK_IF_obs', 'pERK_mbraf_obs', 'pERK_dbraf_obs',
-                   'pERK_craf_obs']:
+    for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
         plot_synergies(
             df_edata, df_rdata,
-            kind='bliss_nn' if measure == 'bliss' and marker == 'pERK_craf_obs'
+            kind='bliss_nn' if measure == 'bliss' and marker == 'pERK_phys_obs'
             else measure,
             rafi_0=rafi_0, meki_0=meki_0, marker=marker)
         plt.savefig(os.path.join(

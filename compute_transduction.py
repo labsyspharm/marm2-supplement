@@ -74,6 +74,13 @@ par, model, solver, full_name = load_model_solver(
 )
 pysb_model, observable = load_model_aux(full_name)
 
+# set counterfactual parameters
+for genereg_feedback in ['SPRY', 'DUSP', 'EGFR']:
+    if genereg_feedback in perturbations.split('_'):
+        model.setParameterByName(
+            f'synthesize_ERKphosphop_{genereg_feedback}_ERK_kM', 1e20
+        )
+
 
 model.setTimepoints([0] + list(np.logspace(-4, 1, 201)))
 model.setFixedParameterByName('EGF_0', 100.0)
@@ -117,15 +124,16 @@ df = pd.concat([
     process_rdata(rdatas, observable, 'monomer', p)
 ], axis=1)
 
+df['sc_fraction_SOS1'] = df['signaling_competent_SOS1'].div(
+    df['tSOS1']
+)
+
 rename_and_fill_drug_columns(df, **{drug['type']: drug_name})
 
 df.drop(columns=[
     col for col in df.columns
     if col.startswith('expl') and not (
-        'channelmbraf' in col or
-        'channeldbraf' in col or
-        'channelcraf' in col or
-        'Tyrp' in col
+        'channelonco' in col or 'channelphys' in col or 'Tyrp' in col
     )
 ], inplace=True)
 

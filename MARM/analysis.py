@@ -425,8 +425,8 @@ def get_obs_df(df, model):
     # total abundances
     t_obs = [ob for ob in obs if ob.startswith('t')]
     # channel
-    a_obs = ['pMEK_craf_obs', 'pMEK_mbraf_obs', 'pMEK_dbraf_obs',
-             'pERK_craf_obs', 'pERK_mbraf_obs', 'pERK_dbraf_obs']
+    a_obs = ['pMEK_phys_obs', 'pMEK_onco_obs', 'pERK_phys_obs',
+             'pERK_onco_obs']
     # fraction phosphorylated
     p_obs = [ob for ob in obs
              if ob.startswith('p') and not ob.endswith('IF_obs')
@@ -501,13 +501,11 @@ def signaling_steps():
         return x.values[-1]
 
     return[
-        ('RASgtp', 'active EGFR',  {'type': 'craf', 'normfun': conc_max}),
-        ('craf pMEK', 'RASgtp',    {'type': 'craf', 'normfun': conc_min}),
-        ('craf pERK', 'craf pMEK', {'type': 'craf', 'normfun': conc_min}),
-        ('mbraf pMEK', 'mBRAF600E',  {'type': 'mbraf', 'normfun': conc_min}),
-        ('mbraf pERK', 'mbraf pMEK', {'type': 'mbraf', 'normfun': conc_min}),
-        ('dbraf pMEK', 'dBRAF600E', {'type': 'mbraf', 'normfun': conc_min}),
-        ('midex pERK', 'dbraf pMEK', {'type': 'mbraf', 'normfun': conc_min}),
+        ('RASgtp', 'active EGFR',  {'type': 'phys', 'normfun': conc_max}),
+        ('phys pMEK', 'RASgtp',    {'type': 'phys', 'normfun': conc_min}),
+        ('phys pERK', 'phys pMEK', {'type': 'phys', 'normfun': conc_min}),
+        ('onco pMEK', 'BRAF600E',  {'type': 'onco', 'normfun': conc_min}),
+        ('onco pERK', 'onco pMEK', {'type': 'onco', 'normfun': conc_min}),
     ]
 
 
@@ -524,46 +522,53 @@ def nodes(df):
 
 def node_species(df, concs=False):
     return {
-        'active EGFR': 'activeEGFR_obs',
-        'mBRAF600E': 'BRAF_mono_obs',
-        'dBRAF600E': 'BRAF_dimer_obs',
-        'RASgtp': 'gtpRAS_obs',
-        'mbraf pMEK': 'pMEK_mbraf_obs',
-        'dbraf pMEK': 'pMEK_dbraf_obs',
-        'craf pMEK': 'pMEK_craf_obs',
-        'mbraf pERK': 'pERK_mbraf_obs',
-        'dbraf pERK': 'pERK_dbraf_obs',
-        'craf pERK': 'pERK_craf_obs',
+        'active EGFR': [col for col in df.columns
+                        if col.startswith('expl_EGFR') and 'Tyrp' in col]
+        if concs else ['activeEGFR_obs'],
+        'BRAF600E': ['tBRAF']
+        if concs else ['tBRAF_obs'],
+        'RASgtp': ['gtpRAS']
+        if concs else ['gtpRAS_obs'],
+        'onco pMEK': [col for col in df.columns
+                      if col.startswith('expl_MEK') and 'channelonco' in col]
+        if concs else ['pMEK_onco_obs'],
+        'phys pMEK': [col for col in df.columns
+                      if col.startswith('expl_MEK') and 'channelphys' in col]
+        if concs else ['pMEK_phys_obs'],
+        'onco pERK': [col for col in df.columns
+                      if col.startswith('expl_ERK') and 'channelonco' in col]
+        if concs else ['pERK_onco_obs'],
+        'phys pERK': [col for col in df.columns
+                      if col.startswith('expl_ERK') and 'channelphys' in col]
+        if concs else ['pERK_phys_obs'],
     }
 
 
 def node_order():
     return {
         'active EGFR': 0,
-        'mBRAF600E': 1,
-        'dBRAF600E': 1,
+        'BRAF600E': 1,
         'RASgtp': 1,
-        'mbraf pMEK': 2,
-        'craf pMEK': 2,
-        'dbraf pMEK': 2,
-        'mbraf pERK': 3,
-        'craf pERK': 3,
-        'dbraf pERK': 3,
+        'onco pMEK': 2,
+        'phys pMEK': 2,
+        'onco pERK': 3,
+        'phys pERK': 3,
+        # 'DUSP': 4,
+        # 'competent SOS1': 4,
     }
 
 
 def node_channel():
     return {
-        'active EGFR': 'craf',
-        'mBRAF600E': 'mbraf',
-        'dBRAF600E': 'dbraf',
-        'RASgtp': 'craf',
-        'mbraf pMEK': 'mbraf',
-        'craf pMEK': 'craf',
-        'dbraf pMEK': 'dbraf',
-        'mbraf pERK': 'mbraf',
-        'craf pERK': 'craf',
-        'dbraf pERK': 'dbraf',
+        'active EGFR': 'phys',
+        'BRAF600E': 'onco',
+        'RASgtp': 'phys',
+        'onco pMEK': 'onco',
+        'phys pMEK': 'phys',
+        'onco pERK': 'onco',
+        'phys pERK': 'phys',
+        # 'DUSP': 'onco',
+        # 'competent SOS1': 'phys',
     }
 
 
@@ -624,10 +629,10 @@ def get_signal_transduction_df(sxs, filename, frame_filter, iterators, mode):
                     df_trans['_to_'.join((v, u))]
                 )
 
-            df_trans['active EGFR_to_craf pERK'] = \
+            df_trans['active EGFR_to_phys pERK'] = \
                 df_trans['active EGFR_to_RASgtp'] * \
-                df_trans['RASgtp_to_craf pMEK'] * \
-                df_trans['craf pMEK_to_craf pERK']
+                df_trans['RASgtp_to_phys pMEK'] * \
+                df_trans['phys pMEK_to_phys pERK']
 
             transductions.append(df_trans)
         except FileNotFoundError as err:
@@ -649,7 +654,7 @@ def get_signal_transduction_df(sxs, filename, frame_filter, iterators, mode):
 
     for var in ['step', 'channel']:
         df_melt[var] = df_melt.variable.apply(
-            lambda x: steps.get(x, {'step': 0, 'channel': 'craf'})[var]
+            lambda x: steps.get(x, {'step': 0, 'channel': 'phys'})[var]
         )
 
     return df_melt

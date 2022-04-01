@@ -37,8 +37,7 @@ groupvars = ['time', rafi_0, meki_0, 'EGF_0', 'EGFR_crispr', 'variable',
 df_sim_melt = average_over_par_index(df_sim_obs, groupvars)
 df_melt = pd.concat([df_sim_melt, df_data_obs[groupvars + ['value']]])
 
-for marker in ['pERK_IF_obs', 'pERK_mbraf_obs', 'pERK_dbraf_obs',
-               'pERK_craf_obs']:
+for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
     plot_simdata_heatmap(
         df_melt,
         [marker], meki_0, meki_label, rafi_0, rafi_label, IFLABEL,

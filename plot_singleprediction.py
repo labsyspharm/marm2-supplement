@@ -29,7 +29,7 @@ for suffix in '', '_cf':
             par = load_parameters(model, sxs, rafi=None, meki=None, prafi=None,
                                   index=index, allow_missing_pars=True)
             obs_name = obs.split('_')[0]
-            offset = df_sim_obs[(df_sim_obs.variable == f'{obs_name}_mbraf_obs') &
+            offset = df_sim_obs[(df_sim_obs.variable == f'{obs_name}_onco_obs') &
                                 (df_sim_obs.datatype == 'simulation') &
                                 (df_sim_obs.par_index == index)]
             offset.value = model.getParameterByName(f'{obs_name}_IF_offset')
