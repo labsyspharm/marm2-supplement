@@ -558,8 +558,9 @@ def plot_isobologram(df, time, egf, rafi_0, meki_0, ax, vmax=2):
 
     smooth_response = scipy.ndimage.filters.gaussian_filter(response, 0.75)
     ax.set_aspect(1)
-    return ax.contour(smooth_response, cmap='viridis', origin='lower', vmin=0,
-                      vmax=vmax, levels=10)
+    x, y = np.meshgrid(meki_concs, rafi_concs)
+    return ax.contour(x, y, smooth_response, cmap='viridis', origin='lower',
+                      vmin=0, vmax=vmax, levels=10)
 
 
 def plot_isobolograms(df_edata, df_rdata, meki_0, rafi_0, time=8, egf=100,
