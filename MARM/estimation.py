@@ -140,8 +140,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 lb[list(names).index(par)] = 4
                 ub[list(names).index(par)] = 5
             elif par == 'SOS1_0':
-                lb[list(names).index(par)] = 3.5
-                ub[list(names).index(par)] = 4.5
+                lb[list(names).index(par)] = 3
+                ub[list(names).index(par)] = 4
             elif par == 'RAS_0':
                 lb[list(names).index(par)] = 5
                 ub[list(names).index(par)] = 6
@@ -169,8 +169,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 lb[list(names).index(par)] = 3.5
                 ub[list(names).index(par)] = 5.5
             if par == 'DUSP_eq':
-                lb[list(names).index(par)] = 1.5
-                ub[list(names).index(par)] = 3.5
+                lb[list(names).index(par)] = 2.5
+                ub[list(names).index(par)] = 4.5
             if par == 'EGFR_eq':
                 lb[list(names).index(par)] = 3
                 ub[list(names).index(par)] = 5
@@ -338,8 +338,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
         # unit: 1/uM*1/h
         elif par.endswith('_kdeg'):
             if par.startswith('p'):
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = 0
+                lb[list(names).index(par)] = -2
+                ub[list(names).index(par)] = 1
             elif par.startswith('m'):
                 lb[list(names).index(par)] = -2
                 ub[list(names).index(par)] = 1

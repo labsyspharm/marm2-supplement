@@ -85,4 +85,4 @@ for drugb in ['Vemurafenib', 'Cobimetinib']:
         figdir, f'{prafi}_{drugb}_isobolograms_EGFRa.pdf')
     )
 
-    write_timestamp(figdir, 'panrafcomboprediction')
+write_timestamp(figdir, 'panrafcomboprediction')

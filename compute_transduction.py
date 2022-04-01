@@ -34,12 +34,12 @@ drugs = {
     'PLX8394': {
         'conc': 'RAFi_0',
         'range': np.logspace(-5, 0, 19),
-        'type': 'rafi'
+        'type': 'prafi'
     },
     'LY3009120': {
         'conc': 'RAFi_0',
         'range': np.logspace(-5, 0, 19),
-        'type': 'rafi'
+        'type': 'prafi'
     },
     'Cobimetinib': {
         'conc': 'MEKi_0',

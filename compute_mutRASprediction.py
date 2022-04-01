@@ -10,7 +10,7 @@ from MARM.analysis import (
 )
 from MARM.estimation import get_problem
 
-import pypesto
+import pypesto.optimize
 import fides
 import logging
 
@@ -61,15 +61,17 @@ problem.ub_full[problem.x_names.index('q61_RAS_gtp_kcat')] = 4
 problem.ub_init_full[problem.x_names.index('q61_RAS_gtp_kcat')] = 4
 problem.normalize()
 
-optimize_options = pypesto.optimize.optimize.OptimizeOptions(
-    startpoint_resample=True,
+startpoints = pypesto.startpoint.UniformStartpoints(
+    check_fval=True, check_grad=True,
+)
+optimize_options = pypesto.optimize.OptimizeOptions(
     allow_failed_starts=True,
 )
 result = pypesto.optimize.minimize(
     problem,
     optimizer,
     n_starts=5,
-    startpoint_method=pypesto.startpoint.uniform,
+    startpoint_method=startpoints,
     options=optimize_options,
 )
 
