@@ -7,7 +7,6 @@ import pandas as pd
 import matplotlib.animation
 import os
 from matplotlib.patches import ArrowStyle
-import matplotlib.colors as mcolors
 
 from .common import plot_and_save_fig, process_rules, \
     get_rule_patterns
@@ -749,32 +748,22 @@ def get_graph_nodes(colors):
         {
             'nodes': ['active EGFR', 'RASgtp'],
             'fillstyle': 'full',
-            'color': colors['craf']
+            'color': colors['phys']
         },
         {
-            'nodes': ['craf pMEK', 'craf pERK'],
+            'nodes': ['phys pMEK', 'phys pERK'],
             'fillstyle': 'left',
-            'color': colors['craf']
+            'color': colors['phys']
         },
         {
-            'nodes': ['dBRAF600E'],
+            'nodes': ['BRAF600E'],
             'fillstyle': 'full',
-            'color': colors['dbraf']
+            'color': colors['onco']
         },
         {
-            'nodes': ['dbraf pMEK', 'dbraf pERK'],
+            'nodes': ['onco pMEK', 'onco pERK'],
             'fillstyle': 'right',
-            'color': colors['dbraf']
-        },
-        {
-            'nodes': ['mBRAF600E'],
-            'fillstyle': 'full',
-            'color': colors['mbraf']
-        },
-        {
-            'nodes': ['mbraf pMEK', 'mbraf pERK'],
-            'fillstyle': 'right',
-            'color': colors['mbraf']
+            'color': colors['onco']
         }
     ]
 
@@ -783,14 +772,11 @@ def get_graph_pos(deltax_outer, deltay_aligned, deltay_unaligned):
     return {
         'active EGFR': (-deltax_outer, deltay_unaligned + deltay_aligned),
         'RASgtp': (-deltax_outer, deltay_unaligned),
-        'craf pMEK': (0, 0),
-        'craf pERK': (0, -deltay_aligned),
-        'mBRAF600E': (deltax_outer, deltay_unaligned),
-        'mbraf pMEK': (0, 0),
-        'mbraf pERK': (0, -deltay_aligned),
-        'dBRAF600E': (0, deltay_unaligned),
-        'dbraf pMEK': (0, 0),
-        'dbraf pERK': (0, -deltay_aligned),
+        'phys pMEK': (0, 0),
+        'phys pERK': (0, -deltay_aligned),
+        'BRAF600E': (deltax_outer, deltay_unaligned),
+        'onco pMEK': (0, 0),
+        'onco pERK': (0, -deltay_aligned),
     }
 
 
@@ -808,9 +794,8 @@ def plot_contextualized_graph(df, iterator, n_plots, figdir, figname,
     df_transduction = df_transduction.reset_index().sort_values(iterator)
 
     colors = {
-        'craf': mcolors.rgb2hex(mcolors.TABLEAU_COLORS['blue']),
-        'dbraf': mcolors.rgb2hex(mcolors.TABLEAU_COLORS['green']),
-        'mbraf': mcolors.rgb2hex(mcolors.TABLEAU_COLORS['orange'])
+        'phys': '#F57F20',
+        'onco': '#2278B5'
     }
 
     G = create_signaling_graph(df_transduction_melt, colors, iterator)
@@ -839,9 +824,8 @@ def plot_contextualized_graph(df, iterator, n_plots, figdir, figname,
             )
 
         rad = {
-            'craf': 0.2,
-            'dbraf': 0.0,
-            'mbraf': -0.2
+            'phys': 0.2,
+            'onco': -0.2
         }
 
         for u, v, data in G.edges(data=True):

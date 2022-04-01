@@ -64,7 +64,7 @@ def plot_simdatadecomp_grid(
     ncols = len(obs)
     nrows = 1
 
-    channels = ['craf', 'dbraf', 'mbraf', 'background', 'data']
+    channels = ['phys', 'onco', 'background', 'data']
 
     data = copy.deepcopy(df_data[df_data.variable.apply(lambda x: x in obs)])
     data_mappings = {
@@ -762,7 +762,7 @@ def plot_deconvolution(df, iterator, figdir, filename):
     height_scale = 1
 
     df.channel = pd.Categorical(df.channel, ordered=True,
-                                categories=['craf', 'mbraf', 'dbraf'])
+                                categories=['phys', 'onco'])
 
     plot = (
             ggplot(mapping=aes(x='time', y='value',

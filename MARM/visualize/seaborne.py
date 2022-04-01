@@ -36,7 +36,7 @@ def plot_parameter_correlations(result, fval_cutoff=None, std_threshold=1e-1):
     par_std = pars.std(axis=0)
 
     corr, pval = corrcoef(pars.T)
-    corr[pval > 0.05/(np.power(corr.shape[0], 2)-corr.shape[0])/2] = 0.0
+    corr[pval > 0.05/(np.power(corr.shape[0],2)-corr.shape[0])/2] = 0.0
     idx = np.where((par_std > std_threshold) & (np.sum(np.abs(corr) > 0, axis=1) > 0))[0]
     corr = corr[np.ix_(idx, idx)]
     names = [result.problem.x_names[ix] for ix in idx]
@@ -49,7 +49,7 @@ def plot_parameter_correlations(result, fval_cutoff=None, std_threshold=1e-1):
 
 
 def get_consistent_parameter_estimates(result, fval_cutoff=None,
-                                       std_threshold=1e-1):
+                                      std_threshold=1e-1):
     pars = get_parameter_array(result, fval_cutoff)
 
     par_std = pars.std(axis=0)
