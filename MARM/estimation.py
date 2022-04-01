@@ -143,8 +143,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 lb[list(names).index(par)] = 3.5
                 ub[list(names).index(par)] = 4.5
             elif par == 'RAS_0':
-                lb[list(names).index(par)] = 4
-                ub[list(names).index(par)] = 5
+                lb[list(names).index(par)] = 5
+                ub[list(names).index(par)] = 6
             elif par == 'BRAF_0':
                 lb[list(names).index(par)] = 2.5
                 ub[list(names).index(par)] = 3.5
@@ -176,13 +176,13 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 ub[list(names).index(par)] = 5
             if par == 'mSPRY_eq':
                 lb[list(names).index(par)] = 0.5
-                ub[list(names).index(par)] = 1.5
+                ub[list(names).index(par)] = 2.5
             if par == 'mDUSP_eq':
                 lb[list(names).index(par)] = 1.0
-                ub[list(names).index(par)] = 2.0
+                ub[list(names).index(par)] = 3.0
             if par == 'mEGFR_eq':
                 lb[list(names).index(par)] = 0.5
-                ub[list(names).index(par)] = 1.5
+                ub[list(names).index(par)] = 2.5
 
         elif par.endswith('_gexpslope'):
             lb[list(names).index(par)] = 0
@@ -268,7 +268,7 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 lb[list(names).index(par)] = -6
                 ub[list(names).index(par)] = 0
             elif par == 'bind_Vemurafenib_RAF_kD':
-                lb[list(names).index(par)] = -2
+                lb[list(names).index(par)] = -4
                 ub[list(names).index(par)] = 0
             elif par == 'bind_Trametinib_MEK_kD':
                 lb[list(names).index(par)] = -4
@@ -295,7 +295,7 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 lb[list(names).index(par)] = -3
                 ub[list(names).index(par)] = -1
             elif par == 'bind_AZ_628_RAF_kD':
-                lb[list(names).index(par)] = -2
+                lb[list(names).index(par)] = -3
                 ub[list(names).index(par)] = -1
             else:
                 lb[list(names).index(par)] = -4
@@ -345,8 +345,8 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
                 ub[list(names).index(par)] = 1
 
         elif par.endswith('_kbase'):
-            lb[list(names).index(par)] = -3
-            ub[list(names).index(par)] = 1
+            lb[list(names).index(par)] = -2
+            ub[list(names).index(par)] = 2
 
         elif par.endswith('IF_scale'):
             lb[list(names).index(par)] = 0
