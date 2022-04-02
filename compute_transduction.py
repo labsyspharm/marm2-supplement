@@ -27,17 +27,17 @@ drugs = {
         'type': 'rafi'
     },
     'AZ_628': {
-        'conc': 'RAFi_0',
+        'conc': 'PRAFi_0',
         'range': np.logspace(-4, 1, 19),
-        'type': 'rafi'
+        'type': 'prafi'
     },
     'PLX8394': {
         'conc': 'RAFi_0',
         'range': np.logspace(-5, 0, 19),
-        'type': 'prafi'
+        'type': 'rafi'
     },
     'LY3009120': {
-        'conc': 'RAFi_0',
+        'conc': 'PRAFi_0',
         'range': np.logspace(-5, 0, 19),
         'type': 'prafi'
     },
