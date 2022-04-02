@@ -197,49 +197,49 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
         # energy differences
         # scale: log10
         # unit: unitless?
-        elif par.endswith('_deltaG'):
+        elif par.endswith('_ddG'):
             if par in [
-                'ep_SOS1S1134p_GRB2_deltaG',
+                'ep_SOS1S1134p_GRB2_ddG',
             ]:
                 lb[list(names).index(par)] = 0
-                ub[list(names).index(par)] = 6
+                ub[list(names).index(par)] = 6 * np.log(10)
             if par in [
 
-                'ep_MEKphosphop_MEKi_deltaG',
+                'ep_pMEK_MEKi_ddG',
             ]:
                 lb[list(names).index(par)] = 0
-                ub[list(names).index(par)] = 4
+                ub[list(names).index(par)] = 4 * np.log(10)
             elif par in [
-                'ep_RAF_RAF_mod_RAFi_double_deltaG'.replace('RAFi', rafi)
+                'ep_RAF_RAF_mod_RAFi_double_ddG'.replace('RAFi', rafi)
                 for rafi in RAFI
             ]:
                 lb[list(names).index(par)] = 0
-                ub[list(names).index(par)] = 5
+                ub[list(names).index(par)] = 5 * np.log(10)
             elif par in [
-                'ep_EGFR_EGFR_mod_EGF_single_deltaG',
-                *['ep_RAF_RAF_mod_RAFi_single_deltaG'.replace('RAFi', rafi)
+                'ep_EGFR_EGFR_mod_EGF_single_ddG',
+                *['ep_RAF_RAF_mod_RAFi_single_ddG'.replace('RAFi', rafi)
                   for rafi in RAFI],
             ]:
-                lb[list(names).index(par)] = -5
+                lb[list(names).index(par)] = -5 * np.log(10)
                 ub[list(names).index(par)] = 0
-            elif par in ['ep_RAS_RAF_mod_RAFi_single_deltaG'.replace('RAFi', rafi)
+            elif par in ['ep_RAS_RAF_mod_RAFi_single_ddG'.replace('RAFi', rafi)
                   for rafi in RAFI]:
-                lb[list(names).index(par)] = -2
+                lb[list(names).index(par)] = -2 * np.log(10)
                 ub[list(names).index(par)] = 0
-            elif par == 'ep_RAF_RAF_mod_RASstategtp_double_deltaG':
-                lb[list(names).index(par)] = -10
-                ub[list(names).index(par)] = -2
+            elif par == 'ep_RAF_RAF_mod_RASgtp_double_ddG':
+                lb[list(names).index(par)] = -10 * np.log(10)
+                ub[list(names).index(par)] = -2 * np.log(10)
             else:
-                lb[list(names).index(par)] = -2
-                ub[list(names).index(par)] = 4
+                lb[list(names).index(par)] = -2 * np.log(10)
+                ub[list(names).index(par)] = 4 * np.log(10)
         # kon
         # scale: log10
         # unit: 1/uM*1/h
         elif par.endswith('_kf'):
             if par in ['bind_pEGFR_GRB2_kf', 'bind_EGF_EGFR_kf',
                        'bind_EGFR_EGFR_kf', 'bind_GRB2_SOS1_kf',
-                       'bind_DUSP_ERKphosphop_kf', 'bind_RASstategtp_RAF_kf',
-                       'bind_CBL_GRB2_kf', 'bind_MEK_ERKphosphou_kf',
+                       'bind_DUSP_pERK_kf', 'bind_RASgtp_RAF_kf',
+                       'bind_CBL_GRB2_kf', 'bind_MEK_uERK_kf',
                        'bind_SOS1_RAS_kf', ]:
                 lb[list(names).index(par)] = 2
                 ub[list(names).index(par)] = 7
@@ -249,56 +249,56 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
         # koff
         # scale: log10
         # unit: 1/h
-        elif par.endswith('_kD'):
+        elif par.endswith('_dG'):
             if par in [
-                'bind_EGFR_EGFR_kD',
+                'bind_EGFR_EGFR_dG',
             ]:
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = 2
-            elif par == 'bind_RAF_RAF_kD':
-                lb[list(names).index(par)] = -2
-                ub[list(names).index(par)] = 4
-            elif par == 'bind_RAFrafANY_MEKphosphou_kD':
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = 2
-            elif par == 'bind_DUSP_ERKphosphop_kD':
-                lb[list(names).index(par)] = -7
-                ub[list(names).index(par)] = -2
-            elif par == 'bind_MEK_ERKphosphou_kD':
-                lb[list(names).index(par)] = -6
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = 2 * np.log(10)
+            elif par == 'bind_RAF_RAF_dG':
+                lb[list(names).index(par)] = -2 * np.log(10)
+                ub[list(names).index(par)] = 4 * np.log(10)
+            elif par == 'bind_RAFrafANY_uMEK_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = 2 * np.log(10)
+            elif par == 'bind_DUSP_pERK_dG':
+                lb[list(names).index(par)] = -7 * np.log(10)
+                ub[list(names).index(par)] = -2 * np.log(10)
+            elif par == 'bind_MEK_uERK_dG':
+                lb[list(names).index(par)] = -6 * np.log(10)
                 ub[list(names).index(par)] = 0
-            elif par == 'bind_Vemurafenib_RAF_kD':
-                lb[list(names).index(par)] = -4
+            elif par == 'bind_Vemurafenib_RAF_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
                 ub[list(names).index(par)] = 0
-            elif par == 'bind_Trametinib_MEK_kD':
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_Selumetinib_MEK_kD':
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_PLX8394_RAF_kD':
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_PD0325901_MEK_kD':
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = -2
-            elif par == 'bind_LY3009120_RAF_kD':
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_Dabrafenib_RAF_kD':
-                lb[list(names).index(par)] = -4
-                ub[list(names).index(par)] = -2
-            elif par == 'bind_Cobimetinib_MEK_kD':
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_Binimetinib_MEK_kD':
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = -1
-            elif par == 'bind_AZ_628_RAF_kD':
-                lb[list(names).index(par)] = -3
-                ub[list(names).index(par)] = -1
+            elif par == 'bind_Trametinib_MEK_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_Selumetinib_MEK_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_PLX8394_RAF_dG':
+                lb[list(names).index(par)] = -3 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_PD0325901_MEK_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = -2 * np.log(10)
+            elif par == 'bind_LY3009120_RAF_dG':
+                lb[list(names).index(par)] = -3 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_Dabrafenib_RAF_dG':
+                lb[list(names).index(par)] = -4 * np.log(10)
+                ub[list(names).index(par)] = -2 * np.log(10)
+            elif par == 'bind_Cobimetinib_MEK_dG':
+                lb[list(names).index(par)] = -3 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_Binimetinib_MEK_dG':
+                lb[list(names).index(par)] = -3 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
+            elif par == 'bind_AZ_628_RAF_dG':
+                lb[list(names).index(par)] = -3 * np.log(10)
+                ub[list(names).index(par)] = -1 * np.log(10)
             else:
-                lb[list(names).index(par)] = -4
+                lb[list(names).index(par)] = -4 * np.log(10)
                 ub[list(names).index(par)] = 0
 
         # kcat
@@ -371,7 +371,7 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
     for val, idx in zip(fixed_vals, fixed_idx):
         print(f'fixing {names[idx]} to {val}')
 
-    x_scales = ['lin' if name.endswith('_phi') else 'log10'
+    x_scales = ['lin' if name.endswith(('_phi', '_dG', 'ddG')) else 'log10'
                 for name in names]
 
     return pypesto.problem.Problem(

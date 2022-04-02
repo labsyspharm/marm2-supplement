@@ -42,6 +42,8 @@ def cleanup_unused(model):
 
     initial_eq = sp.Matrix([
         initial.value.expand_expr()
+        if isinstance(initial.value, pysb.Expression)
+        else initial.value
         for initial in model.initials
     ])
 
@@ -95,8 +97,13 @@ def cleanup_unused(model):
 
     model.energypatterns = pysb.ComponentSet([
         ep for ep in model.energypatterns
-        if len(ep.energy.expand_expr().free_symbols.intersection(
-            unused_pars)) == 0
+        if (
+            isinstance(ep.energy, pysb.Expression) and not
+            ep.energy.expand_expr().free_symbols.intersection(unused_pars)
+        ) or (
+            isinstance(ep.energy, pysb.Parameter)
+            and ep.energy not in unused_pars
+        )
     ])
 
     model.reset_equations()
