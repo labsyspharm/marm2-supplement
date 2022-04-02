@@ -22,9 +22,9 @@ else:
 
 INSTANCES = {
     'EGF': 'initEGF',
-    'RAFi': 'initRAFi',
-    'MEKi': 'initMEKi',
-    'PRAFi': 'initPRAFi',
+    'RAFi': 'RAFi_0',
+    'MEKi': 'MEKi_0',
+    'PRAFi': 'PRAFi_0',
 }
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
