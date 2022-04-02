@@ -73,6 +73,7 @@ result = pypesto.optimize.minimize(
     n_starts=5,
     startpoint_method=startpoints,
     options=optimize_options,
+    filename=None,
 )
 
 par_dict = {}
