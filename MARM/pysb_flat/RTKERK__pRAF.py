@@ -412,4 +412,3 @@ Annotation(mSPRY, 'http://identifiers.org/hgnc/11270', 'is')
 Annotation(mSPRY, 'http://identifiers.org/hgnc/15533', 'is')
 Annotation(SOS1, 'http://identifiers.org/uniprot/Q07889', 'is')
 Annotation(CBL, 'http://identifiers.org/uniprot/P22681', 'is')
-
