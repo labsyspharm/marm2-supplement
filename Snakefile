@@ -23,7 +23,7 @@ import itertools
 
 MODEL = 'RTKERK'
 
-VARIANTS = ['base', 'pRAF']
+VARIANTS = ['pRAF']
 DATASETS = ['EGF_EGFR_MEKi_PRAFi_RAFi']
 INSTANCES = 'EGF_MEKi_PRAFi_RAFi'
 
