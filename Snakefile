@@ -115,6 +115,8 @@ rule build_instance:
     output:
         get_model_module_file_instance('{model}', '{variant}', '{instance}',
                                        '{modifications}'),
+    threads:
+        4
     wildcard_constraints:
         model='[A-Z]+',
         variant='[\w]+',

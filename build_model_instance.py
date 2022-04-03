@@ -1,3 +1,4 @@
+import os
 import sys
 import pysb
 import copy
@@ -136,4 +137,5 @@ MARM.model.cleanup_unused(model)
 MARM.model.export_model(model, ['pysb_flat', 'bngl'])
 MARM.model.generate_equations(model)
 MARM.model.write_observable_function(model)
+os.environ["AMICI_IMPORT_NPROCS"] = '4'
 MARM.model.compile_model(model)
