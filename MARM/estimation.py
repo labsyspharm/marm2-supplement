@@ -366,7 +366,7 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
 
     # paradox breaker
     fixed_vals.append(0.0)
-    fixed_idx.append(names.index('ep_RAF_RAF_mod_PLX8394_single_deltaG'))
+    fixed_idx.append(names.index('ep_RAF_RAF_mod_PLX8394_single_dG'))
 
     for val, idx in zip(fixed_vals, fixed_idx):
         print(f'fixing {names[idx]} to {val}')
@@ -459,8 +459,8 @@ def get_model(model_name, variant, dataset, modifications=None):
     model = model_module.getModel()
 
     scales = amici.parameterScalingFromIntVector([
-        amici.ParameterScaling.none if par.endswith('_phi') else
-        amici.ParameterScaling.log10
+        amici.ParameterScaling.none if par.endswith(('_phi', '_dG', '_ddG'))
+        else amici.ParameterScaling.log10
         for par in model.getParameterNames()
     ])
 
