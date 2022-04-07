@@ -84,9 +84,9 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         'panrafcomboprediction':
             'EGF_EGFR_MEKi_PRAFi_RAFi_panrafcomboprediction',
         'mutRASprediction_engineered':
-            'MEKi_PRAFi_RAFi_engineered_mutrasprediction',
+            'NRAS_MEKi_PRAFi_RAFi_engineered_mutrasprediction',
         'mutRASprediction_engineered_combo':
-            'MEKi_PRAFi_RAFi_engineered_mutrascomboprediction',
+            'NRAS_MEKi_PRAFi_RAFi_engineered_mutrascomboprediction',
         'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
     model_variant = {
@@ -95,8 +95,8 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         'singleprediction': sxs['variant'],
         'comboprediction': sxs['variant'],
         'panrafcomboprediction': sxs['variant'],
-        'mutRASprediction_engineered': 'nrasq61mut',
-        'mutRASprediction_engineered_combo': 'nrasq61mut',
+        'mutRASprediction_engineered': sxs['variant'],
+        'mutRASprediction_engineered_combo': sxs['variant'],
         'ht29': sxs['variant']
     }
     if channel_specific_dusp_binding:

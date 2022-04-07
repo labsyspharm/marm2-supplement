@@ -26,9 +26,18 @@ INSTANCES = {
     'RAFi': 'RAFi_0',
     'MEKi': 'MEKi_0',
     'PRAFi': 'PRAFi_0',
+    'NRAS': 'NRAS_Q61mut',
 }
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
+if 'NRAS' in instance.split('_'):
+    pysb.Parameter('NRAS_Q61mut', 0.0)
+    pysb.Parameter('q61_RAS_gtp_kcat', 0.01)
+    pysb.Expression('NRAS_mut_activation', NRAS_Q61mut * q61_RAS_gtp_kcat)
+    pysb.Rule('mutated_RAS_guanosine_exchange',
+              RAS(sos1=None, state='gdp') >> RAS(sos1=None, state='gtp'),
+              NRAS_mut_activation)
+
 model.name = get_model_instance_name(model_name, variant, instance,
                                      modifications)
 
@@ -137,6 +146,7 @@ MARM.model.cleanup_unused(model)
 MARM.model.export_model(model, ['pysb_flat', 'bngl'])
 MARM.model.generate_equations(model)
 MARM.model.write_observable_function(model)
-os.environ["AMICI_IMPORT_NPROCS"] = '4'
-os.environ["AMICI_PARALLEL_COMPILE"] = '4'
+#os.environ["AMICI_IMPORT_NPROCS"] = '4'
+#os.environ["AMICI_PARALLEL_COMPILE"] = '4'
+os.environ["AMICI_CXXFLAGS"] = '-O1'
 MARM.model.compile_model(model)

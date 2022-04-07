@@ -50,24 +50,6 @@ def get_instances(wildcards, modifications=None):
         for instance in instances
     ]
 
-
-def get_instances_mutras(wildcards, modifications=None):
-    options = f'{wildcards.dataset}'.split('_')
-    if 'EGFR' in options:
-        options.remove('EGFR')
-    instances = []
-    for r in range(len(options)+1):
-        instances.extend(list(itertools.combinations(options, r)))
-    instances = [
-        "_".join(sorted(instance)) for instance in instances
-    ]
-    return [
-        get_model_module_file_instance(wildcards.model,
-                                       'nrasq61mut',
-                                       instance, modifications)
-        for instance in instances
-    ]
-
 JOBS = [str(i) for i in range(int(os.environ.get('N_JOBS', 1e3)))]
 AJOBS = [f'{i:03}' for i in range(N_RUNS)]
 MS_PER_JOB = os.environ.get('MS_PER_JOB', 1)
@@ -255,11 +237,8 @@ rule compute_feedbacks:
 
 rule compute_mutRASprediction:
     input:
-        model=lambda wildcards: get_instances(wildcards, 'channel_monoobs'),
-        model_mutras=lambda wildcards: get_instances_mutras(wildcards),
-        model_mutras_cm=lambda wildcards: get_instances_mutras(
-            wildcards, 'channel_monoobs'
-        ),
+        model=lambda wildcards: get_instances(wildcards),
+        model_cm=lambda wildcards: get_instances(wildcards,'channel_monoobs'),
         data_training=expand(rules.process_data.output,
                              dataset='MEKi_PRAFi_RAFi_{cell_line}_mutrastraining'),
         data_prediction=expand(rules.process_data.output,
@@ -440,7 +419,7 @@ rule build_models:
     input:
         expand(
             rules.build_instance.output,
-            model=MODEL, variant=VARIANTS + ['nrasq61mut'],
+            model=MODEL, variant=VARIANTS,
             modifications=['', 'channel_monoobs'],
              instance=[
                 '_'.join(sorted(parts))
