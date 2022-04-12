@@ -110,17 +110,17 @@ if 'channel' in modifications or 'channelcf' in modifications:
                                 and mp.site_conditions['phospho'] == 'p':
                             mp.site_conditions['channel'] = channel
 
-        for rule_name in ['DUSP_binds_pERK', 'DUSP_dissociates_from_ERK']:
-            onco_rule = model.rules[rule_name]
-            onco_rule.rename(onco_rule.name.replace('ERK', 'ERK_onco'))
+        rule_name = 'bind_DUSP_pERK'
+        onco_rule = model.rules[rule_name]
+        onco_rule.rename(onco_rule.name.replace('ERK', 'ERK_onco'))
 
-            phys_rule = copy.deepcopy(onco_rule)
-            phys_rule.name = phys_rule.name.replace('_onco', '_phys')
-            model.add_component(phys_rule)
+        phys_rule = copy.deepcopy(onco_rule)
+        phys_rule.name = phys_rule.name.replace('_onco', '_phys')
+        model.add_component(phys_rule)
 
-            for rule, channel in zip([onco_rule, phys_rule],
-                                     ['onco', 'phys']):
-                make_binding_channel_specific(rule, 'DUSP', 'erk', channel)
+        for rule, channel in zip([onco_rule, phys_rule],
+                                 ['onco', 'phys']):
+            make_binding_channel_specific(rule, 'DUSP', 'erk', channel)
 
         for rule_name, channel in zip(
                 ['DUSP_dephosphorylates_ERK_onco',
