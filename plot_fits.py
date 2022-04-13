@@ -41,10 +41,11 @@ plot_and_save_fig(figdir, 'optimizer_convergence.pdf')
 parameter_df = save_parameters(result, model_name, variant, dataset)
 
 x_names = [problem.x_names[ix] for ix in problem.x_free_indices]
+x_names = sorted(x_names, key=lambda x: x.split('_')[-1])
 
 parameter_df_log = parameter_df.copy()
 for x_name in x_names:
-    if x_name.startswith(('_phi', '_dG', '_ddG')):
+    if x_name.endswith(('_phi', '_dG', '_ddG')):
         continue
     parameter_df_log[x_name] = np.log10(parameter_df[x_name])
 
