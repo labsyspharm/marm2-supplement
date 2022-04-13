@@ -91,7 +91,6 @@ rule clean:
 
 rule build_instance:
     input:
-        script='build_model_instance.py',
         model_file=get_model_variant_file('{model}','{variant}'),
         method=os.path.join('MARM', 'model.py')
     output:
@@ -105,7 +104,7 @@ rule build_instance:
         instance='[\w]*',
         modifications='[\w]*'
     shell:
-        'python3 {input.script} {wildcards.model} {wildcards.variant}' \
+        'python3 build_model_instance.py {wildcards.model} {wildcards.variant}' \
         ' {wildcards.instance} {wildcards.modifications}'
 
 rule process_data:
