@@ -41,7 +41,7 @@ plot_and_save_fig(figdir, 'optimizer_convergence.pdf')
 parameter_df = save_parameters(result, model_name, variant, dataset)
 
 x_names = [problem.x_names[ix] for ix in problem.x_free_indices]
-x_names = sorted(x_names, key=lambda x: x.split('_')[-1])
+x_names_sorted = sorted(x_names, key=lambda x: x.split('_')[-1])
 
 parameter_df_log = parameter_df.copy()
 for x_name in x_names:
@@ -52,7 +52,7 @@ for x_name in x_names:
 try:
     fig = plt.figure(figsize=(SEABORNE_FIGWIDTH*4, SEABORNE_FIGWIDTH))
     sns.clustermap(
-        parameter_df_log.loc[:N_RUNS, x_names],
+        parameter_df_log.loc[:N_RUNS, x_names_sorted],
         z_score=1,
         xticklabels=True, yticklabels=False,
     )
@@ -62,11 +62,13 @@ except:
 
 fig = plt.figure(figsize=(SEABORNE_FIGWIDTH, SEABORNE_FIGWIDTH/2))
 ax = sns.boxplot(
-    data=parameter_df_log.loc[:, x_names],
+    data=parameter_df_log.loc[:, x_names_sorted],
     color='gray'
 )
-ax.plot(problem.ub, linestyle='dotted', color='black')
-ax.plot(problem.lb, linestyle='dotted', color='black')
+ax.plot([problem.ub[x_names.index(name)] for name in x_names_sorted],
+        linestyle='dotted', color='black')
+ax.plot([problem.lb[x_names.index(name)] for name in x_names_sorted],
+        linestyle='dotted', color='black')
 plt.xticks(rotation=90)
 plot_and_save_fig(figdir, 'boxplot.pdf')
 
