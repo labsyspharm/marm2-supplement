@@ -124,10 +124,6 @@ df = pd.concat([
     process_rdata(rdatas, observable, 'monomer', p)
 ], axis=1)
 
-df['sc_fraction_SOS1'] = df['signaling_competent_SOS1'].div(
-    df['tSOS1']
-)
-
 rename_and_fill_drug_columns(df, **{drug['type']: drug_name})
 
 df.drop(columns=[

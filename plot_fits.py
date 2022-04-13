@@ -41,12 +41,17 @@ plot_and_save_fig(figdir, 'optimizer_convergence.pdf')
 parameter_df = save_parameters(result, model_name, variant, dataset)
 
 x_names = [problem.x_names[ix] for ix in problem.x_free_indices]
-idx = sorted(range(len(problem.ub)), key=lambda k: problem.ub[k])
+
+parameter_df_log = parameter_df.copy()
+for x_name in x_names:
+    if x_name.startswith(('_phi', '_dG', '_ddG')):
+        continue
+    parameter_df_log[x_name] = np.log10(parameter_df[x_name])
 
 try:
     fig = plt.figure(figsize=(SEABORNE_FIGWIDTH*4, SEABORNE_FIGWIDTH))
     sns.clustermap(
-        parameter_df.loc[:N_RUNS].apply(np.log10)[x_names],
+        parameter_df_log.loc[:N_RUNS, x_names],
         z_score=1,
         xticklabels=True, yticklabels=False,
     )
@@ -56,17 +61,13 @@ except:
 
 fig = plt.figure(figsize=(SEABORNE_FIGWIDTH, SEABORNE_FIGWIDTH/2))
 ax = sns.boxplot(
-    data=parameter_df.apply(np.log10)[[
-        x_names[ix] for ix in idx
-    ]],
+    data=parameter_df_log.loc[:, x_names],
     color='gray'
 )
-ax.plot([problem.ub[ix] for ix in idx], linestyle='dotted', color='black')
-ax.plot([problem.lb[ix] for ix in idx], linestyle='dotted', color='black')
+ax.plot(problem.ub, linestyle='dotted', color='black')
+ax.plot(problem.lb, linestyle='dotted', color='black')
 plt.xticks(rotation=90)
 plot_and_save_fig(figdir, 'boxplot.pdf')
-
-log_parameter_df = parameter_df[x_names].apply(np.log10)
 
 plot_parameter_correlations(result, fval_cutoff=np.inf, std_threshold=1e-1)
 plot_and_save_fig(figdir, 'parameter_correlations.pdf')

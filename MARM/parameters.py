@@ -82,7 +82,7 @@ def save_parameters(result, model_name, variant, dataset):
     }
     parameter_dict.update({
         result.problem.x_names[i]: pars[:, i]
-        if result.problem.x_names[i].endswith('_phi')
+        if result.problem.x_names[i].endswith(('_phi', '_dG', '_ddG'))
         else pow(10, pars[:, i])
         for i in range(result.problem.dim_full)
     })
