@@ -119,7 +119,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
 
             # simulate control condition
             sim_ref = cobj([
-                val if name.endswith('_phi')
+                val if name.endswith(('_phi', '_dG', '_ddG'))
                 else np.log10(val)
                 for val, name in zip(par, cobj.x_names)
             ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
@@ -156,7 +156,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                       f'cell line ht29')
                 par[ix] *= par_diff
 
-            par[obj.x_names.index('DUSP_eq')] /= 1000
+            #par[obj.x_names.index('DUSP_eq')] /= 1000
 
             sim_mod = cobj([
                 val if name.endswith('_phi')
@@ -211,7 +211,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         par = [par_dict[name] for name in obj.x_names]
 
     par = [
-        val if name.endswith('_phi')
+        val if name.endswith(('_phi', '_dG', '_ddG'))
         else np.log10(val)
         for val, name in zip(par, obj.x_names)
     ]
