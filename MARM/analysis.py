@@ -255,9 +255,9 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         tuple([
             re.search(
                 fr'bind_([\w_]+)_{target}_kD',
-                mapping.map_sim_var[f'bind_{inh}_{target}_kD']
+                mapping.map_sim_var[f'bind_{inh}_{target}_dG']
             ).group(1)
-            if f'bind_{inh}_{target}_kD' in mapping.map_sim_var
+            if f'bind_{inh}_{target}_dG' in mapping.map_sim_var
             else None
             for inh, target in zip(['PRAFi', 'RAFi', 'MEKi'],
                                    ['RAF', 'RAF', 'MEK'])
