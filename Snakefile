@@ -95,7 +95,7 @@ rule clean:
 
 rule build_instance:
     input:
-        script='build_model_instance.py'
+        script='build_model_instance.py',
         model_file=get_model_variant_file('{model}','{variant}'),
         method=os.path.join('MARM', 'model.py')
     output:
