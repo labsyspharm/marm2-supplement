@@ -31,9 +31,11 @@ INSTANCES = {
 
 model = MARM.model.get_model_instance(model_name, variant, instance, INSTANCES)
 if 'NRAS' in instance.split('_'):
-    pysb.Parameter('NRAS_Q61mut', 0.0)
-    pysb.Parameter('q61_RAS_gtp_kcat', 0.01)
-    pysb.Expression('NRAS_mut_activation', NRAS_Q61mut * q61_RAS_gtp_kcat)
+    RAS = model.monomers['RAS']
+    NRAS_Q61mut = pysb.Parameter('NRAS_Q61mut', 0.0)
+    q61_RAS_gtp_kcat = pysb.Parameter('q61_RAS_gtp_kcat', 0.01)
+    NRAS_mut_activation = pysb.Expression('NRAS_mut_activation',
+                                          NRAS_Q61mut * q61_RAS_gtp_kcat)
     pysb.Rule('mutated_RAS_guanosine_exchange',
               RAS(sos1=None, state='gdp') >> RAS(sos1=None, state='gtp'),
               NRAS_mut_activation)
