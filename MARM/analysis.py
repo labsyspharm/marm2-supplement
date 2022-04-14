@@ -84,9 +84,9 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         'panrafcomboprediction':
             'EGF_EGFR_MEKi_PRAFi_RAFi_panrafcomboprediction',
         'mutRASprediction_engineered':
-            'NRAS_MEKi_PRAFi_RAFi_engineered_mutrasprediction',
+            'MEKi_NRAS_PRAFi_RAFi_engineered_mutrasprediction',
         'mutRASprediction_engineered_combo':
-            'NRAS_MEKi_PRAFi_RAFi_engineered_mutrascomboprediction',
+            'MEKi_NRAS_PRAFi_RAFi_engineered_mutrascomboprediction',
         'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
     if channel_specific_dusp_binding:

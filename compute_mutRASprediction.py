@@ -33,7 +33,7 @@ df_parameters = load_parameters_as_dataframe(sxs['model_name'],
                                              sxs['dataset'])
 
 problem = get_problem(sxs['model_name'], sxs['variant'],
-                      f'NRAS_MEKi_PRAFi_RAFi_{cell_line}_mutrastraining',
+                      f'MEKi_NRAS_PRAFi_RAFi_{cell_line}_mutrastraining',
                       sxs['threads'])
 
 free_pars = ['q61_RAS_gtp_kcat']
