@@ -10,7 +10,7 @@ import datetime
 from MARM.estimation import get_model
 from MARM.paths import get_results_path, get_traces_path
 from MARM.estimation import get_problem
-from pypesto.optimize.optimizer import read_result_from_file
+from pypesto.optimize import read_result_from_file
 
 
 if __name__ == "__main__":
@@ -45,6 +45,7 @@ if __name__ == "__main__":
             if rfile in result_files and rfile not in parsed_results:
                 print(f'loading full results for run {run}')
                 with open(os.path.join(results_path, rfile), 'rb') as f:
+                    continue
                     result = pickle.load(f)
                     # thin results
                     optimizer_results += result.list
