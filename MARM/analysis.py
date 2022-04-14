@@ -122,7 +122,8 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                 val if name.endswith(('_phi', '_dG', '_ddG'))
                 else np.log10(val)
                 for val, name in zip(par, cobj.x_names)
-            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
+            ], sensi_orders=(0,), return_dict=True,
+            amici_reporting=amici.RDataReporting.full)['rdatas'][0]
 
             # simulate control conditions, correct for offset & scaling
             pERK_ref = (sim_ref.y[
@@ -162,7 +163,8 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                 val if name.endswith('_phi')
                 else np.log10(val)
                 for val, name in zip(par, cobj.x_names)
-            ], sensi_orders=(0,), return_dict=True)['rdatas'][0]
+            ], sensi_orders=(0,), return_dict=True,
+            amici_reporting=amici.RDataReporting.full)['rdatas'][0]
 
             pERK_mod = (sim_mod.y[
                 0, cobj.amici_model.getObservableNames().index('pERK_IF_obs')
@@ -240,7 +242,8 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
     obj._objectives = [objective for objective in obj._objectives
                        if len(objective.edatas) > 0]
 
-    rdatas = obj(par, sensi_orders=(0,), return_dict=True)['rdatas']
+    rdatas = obj(par, sensi_orders=(0,), return_dict=True,
+                 amici_reporting=amici.RDataReporting.full)['rdatas']
     edatas = [edata
               for objective in obj._objectives
               for edata in objective.edatas]
@@ -254,7 +257,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
     drugs = [
         tuple([
             re.search(
-                fr'bind_([\w_]+)_{target}_kD',
+                fr'bind_([\w_]+)_{target}_dG',
                 mapping.map_sim_var[f'bind_{inh}_{target}_dG']
             ).group(1)
             if f'bind_{inh}_{target}_dG' in mapping.map_sim_var
