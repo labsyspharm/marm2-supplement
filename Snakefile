@@ -33,10 +33,14 @@ CONDITION_VARIANTS = [condition[0] for condition in CONDITIONS]
 CONDITION_DATASETS = [condition[1] for condition in CONDITIONS]
 
 
-def get_instances(wildcards, modifications=None):
+def get_instances(wildcards, modifications=None, mutRAS=False):
     options = f'{wildcards.dataset}'.split('_')
     if 'EGFR' in options:
         options.remove('EGFR')
+    if mutRAS and 'EGF' in options:
+        options.remove('EGF')
+    if mutRAS:
+        options.append('NRAS')
     instances = []
     for r in range(len(options)+1):
         instances.extend(list(itertools.combinations(options, r)))
@@ -236,14 +240,14 @@ rule compute_feedbacks:
 
 rule compute_mutRASprediction:
     input:
-        model=lambda wildcards: get_instances(wildcards),
-        model_cm=lambda wildcards: get_instances(wildcards,'channel_monoobs'),
+        model=lambda wildcards: get_instances(wildcards, mutRAS=True),
+        model_cm=lambda wildcards: get_instances(wildcards,'channel_monoobs', mutRAS=True),
         data_training=expand(rules.process_data.output,
-                             dataset='MEKi_PRAFi_RAFi_{cell_line}_mutrastraining'),
+                             dataset='NRAS_MEKi_PRAFi_RAFi_{cell_line}_mutrastraining'),
         data_prediction=expand(rules.process_data.output,
-                               dataset='MEKi_PRAFi_RAFi_{cell_line}_mutrasprediction'),
+                               dataset='NRAS_MEKi_PRAFi_RAFi_{cell_line}_mutrasprediction'),
         data_comboprediction=expand(rules.process_data.output,
-                                       dataset='MEKi_PRAFi_RAFi_engineered_mutrascomboprediction'),
+                                    dataset='NRAS_MEKi_PRAFi_RAFi_engineered_mutrascomboprediction'),
         script='compute_mutRASprediction.py',
         parameters=get_parameters_file('{model}', '{variant}', '{dataset}'),
     output:

@@ -820,6 +820,8 @@ def filter_experiments(data, instances):
         data = data[data.EGF_0 == 0.0]
     if 'egfr' not in instances_lower:
         data = data[data.EGFR_crispr == 1.0]
+    if 'nras' not in instances_lower:
+        data = data[data.NRAS_Q61mut == 0.0]
 
     subset = (
         (data[[f'{drug}_0' for drug in MEKI + RAFI + PANRAFI]] > 0.0).sum(
@@ -843,21 +845,11 @@ def filter_experiments(data, instances):
         data = data[subset.apply(lambda x: not x) | (data.EGFR_crispr != 1.0)]
 
     if 'engineered' in instances_lower and 'mutrastraining' in instances_lower:
-        ras_subset = (
-                (data.NRAS_Q61mut == 1.0) &
-                ((data[f'Cobimetinib_0'] > 0.0001) +
-                 (data[f'Vemurafenib_0'] > 0.001) == 0)
-        )
-    else:
-        ras_subset = (
-            (data.NRAS_Q61mut == 0.0) |
-            ((data[[f'{drug}_0' for drug in MEKI + RAFI + PANRAFI]] > 0.0).sum(
-                    axis=1
-                ) == 0)
-        )
-
-    if 'mutrastraining' in instances_lower:
-        data = data[ras_subset]
+        data = data[(
+            (data.NRAS_Q61mut == 1.0) &
+            ((data[f'Cobimetinib_0'] > 0.0001) +
+             (data[f'Vemurafenib_0'] > 0.001) == 0)
+        )]
 
     return data
 
