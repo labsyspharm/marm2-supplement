@@ -160,7 +160,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
             #par[obj.x_names.index('DUSP_eq')] /= 1000
 
             sim_mod = cobj([
-                val if name.endswith('_phi')
+                val if name.endswith(('_phi', '_dG', '_ddG'))
                 else np.log10(val)
                 for val, name in zip(par, cobj.x_names)
             ], sensi_orders=(0,), return_dict=True,
@@ -175,7 +175,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                 if xname.endswith('_eq'):
                     gene_name = xname[:-3].replace("m", "")
                     kM = par[obj.x_names.index(
-                        f'synthesize_ERKphosphop_{gene_name}_ERK_kM'
+                        f'synthesize_pERK_{gene_name}_ERK_kM'
                     )]
                     # correct for difference in baseline pERK
                     gexprfactor = (pERK_ref / (pERK_ref + kM)) / (
@@ -198,7 +198,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                 par[ix] *= np.exp(x_diff)
 
             crdata = cobj([
-                    val if name.endswith('_phi')
+                    val if name.endswith(('_phi', '_dG', '_ddG'))
                     else np.log10(val)
                     for val, name in zip(par, obj.x_names)
             ], sensi_orders=(0,), return_dict=True)['rdatas']
