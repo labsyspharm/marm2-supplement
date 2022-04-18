@@ -94,10 +94,7 @@ if 'channel' in modifications or 'channelcf' in modifications:
     )
     pysb.Expression(
         'gtpRAS_obs',
-        pysb.Observable(
-            'gtpRAS',
-            model.monomers['RAS'](state='gtp')
-        )
+        model.observables['gtpRAS']
     )
     BRAF = model.monomers['BRAF']
     CRAF = model.monomers['CRAF']
