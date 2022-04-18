@@ -84,6 +84,7 @@ if 'channel' in modifications or 'channelcf' in modifications:
         'DUSP_dephosphorylates_ERK',
         ('phospho', 'p')
     )
+    # additional observables
     pysb.Expression(
         'activeEGFR_obs',
         pysb.Observable(
@@ -91,6 +92,54 @@ if 'channel' in modifications or 'channelcf' in modifications:
             model.monomers['EGFR'](Tyr='p')
         )
     )
+    pysb.Expression(
+        'gtpRAS_obs',
+        pysb.Observable(
+            'gtpRAS',
+            RAS(state='gtp')
+        )
+    )
+    BRAF = model.monomers['BRAF']
+    CRAF = model.monomers['CRAF']
+    MEK = model.monomers['MEK']
+    pysb.Observable(
+        'baseline_R',
+        BRAF(raf=None, rafi=None) +
+        CRAF(raf=None, rafi=None)
+    )
+    pysb.Observable(
+        'baseline_IR',
+        BRAF(raf=None, rafi=pysb.ANY) +
+        CRAF(raf=None, rafi=pysb.ANY)
+    )
+    pysb.Observable(
+        'baseline_RR',
+        BRAF(rafi=None) % BRAF(rafi=None) +
+        CRAF(rafi=None) % BRAF(rafi=None) +
+        CRAF(rafi=None) % CRAF(rafi=None)
+    )
+    pysb.Observable(
+        'baseline_RRI',
+        BRAF(rafi=pysb.ANY) % BRAF(rafi=None) +
+        BRAF(rafi=pysb.ANY) % CRAF(rafi=None) +
+        BRAF(rafi=None) % CRAF(rafi=pysb.pysb.ANY) +
+        CRAF(rafi=pysb.ANY) % CRAF(rafi=None)
+    )
+    pysb.Observable(
+        'baseline_IRRI',
+        BRAF(rafi=pysb.ANY) % BRAF(rafi=pysb.ANY)
+        + BRAF(rafi=pysb.ANY) % CRAF(rafi=pysb.ANY)
+        + CRAF(rafi=pysb.ANY) % CRAF(rafi=pysb.ANY)
+    )
+    pysb.Observable('RAF_marginal_RAFi', BRAF(rafi=pysb.ANY) + CRAF(rafi=pysb.ANY))
+    pysb.Observable('RAF_marginal_RAS', BRAF(RBD=pysb.ANY) + CRAF(RBD=pysb.ANY))
+    pysb.Observable('RAF_marginal_RAF', BRAF(raf=pysb.ANY) + CRAF(raf=pysb.ANY))
+    pysb.Observable('RAF_marginal_MEK', BRAF(mek=pysb.ANY) + CRAF(mek=pysb.ANY))
+    pysb.Observable('drugfree_uMEK', MEK(meki=None, phospho='u'))
+    pysb.Observable('inhibited_uMEK', MEK(meki=pysb.ANY, phospho='u'))
+    pysb.Observable('drugfree_pMEK', MEK(meki=None, phospho='p'))
+    pysb.Observable('inhibited_pMEK', MEK(meki=pysb.ANY, phospho='p'))
+
 
     if 'channelcf' in modifications:
         model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']

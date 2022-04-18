@@ -32,14 +32,14 @@ for state in states:
                 df[['tBRAF', 'tCRAF']].sum(axis=1), axis=0
             )
 
-#if drug in RAFI + PANRAFI:
-#    plot_raf_states(df, f'{drug}_0', drug_label, figdir,
-#                    f'rafstates_{drug}_{perturbations}.pdf')
+if drug in RAFI + PANRAFI:
+    plot_raf_states(df, f'{drug}_0', drug_label, figdir,
+                    f'rafstates_{drug}_{perturbations}.pdf')
 
-#plot_drug_free_monomers(df, f'{drug}_0', drug_label, figdir,
-#                        f'drugfree_{drug}_{perturbations}.pdf')
-#plot_raf_dimerization(df, f'{drug}_0', drug_label, figdir,
-#                      f'dimerization_{drug}_{perturbations}.pdf')
+plot_drug_free_monomers(df, f'{drug}_0', drug_label, figdir,
+                        f'drugfree_{drug}_{perturbations}.pdf')
+plot_raf_dimerization(df, f'{drug}_0', drug_label, figdir,
+                      f'dimerization_{drug}_{perturbations}.pdf')
 
 df = extend_drug_adapted(df, 0.1)
 
