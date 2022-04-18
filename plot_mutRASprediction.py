@@ -17,7 +17,7 @@ from MARM.visualize import (
 
 sxs = read_settings(sys.argv, index=False, threads=False)
 
-model = get_model(sxs['model_name'], 'nrasq61mut', sxs['dataset'],
+model = get_model(sxs['model_name'], sxs['variant'], 'MEKi_NRAS_PRAFi_RAFi',
                   'channel_monoobs')
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
 
