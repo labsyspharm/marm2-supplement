@@ -119,7 +119,7 @@ if 'channel' in modifications or 'channelcf' in modifications:
         'baseline_RRI',
         BRAF(rafi=pysb.ANY) % BRAF(rafi=None) +
         BRAF(rafi=pysb.ANY) % CRAF(rafi=None) +
-        BRAF(rafi=None) % CRAF(rafi=pysb.pysb.ANY) +
+        BRAF(rafi=None) % CRAF(rafi=pysb.ANY) +
         CRAF(rafi=pysb.ANY) % CRAF(rafi=None)
     )
     pysb.Observable(
@@ -136,7 +136,6 @@ if 'channel' in modifications or 'channelcf' in modifications:
     pysb.Observable('inhibited_uMEK', MEK(meki=pysb.ANY, phospho='u'))
     pysb.Observable('drugfree_pMEK', MEK(meki=None, phospho='p'))
     pysb.Observable('inhibited_pMEK', MEK(meki=pysb.ANY, phospho='p'))
-
 
     if 'channelcf' in modifications:
         model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']
