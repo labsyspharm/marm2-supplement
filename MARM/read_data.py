@@ -84,6 +84,8 @@ def read_IF_experiment(data, df, specs):
                 # read in data from experiment specification
                 for val in ['time', 't_presim',
                             'EGF_0', 'EGF_0_preeq', 'EGF_0_presim',
+                            'NRAS_Q61mut', 'NRAS_Q61mut_preeq',
+                            'NRAS_Q61mut_presim',
                             'Vemurafenib_0', 'Vemurafenib_0_preeq',
                             'Vemurafenib_0_presim',
                             'Cobimetinib_0', 'Cobimetinib_0_preeq',
@@ -182,6 +184,7 @@ def read_MS_experiment(data, df, specs):
             for val in [
                 'time', 't_presim',
                 'EGF_0', 'EGF_0_preeq', 'EGF_0_presim',
+                'NRAS_Q61mut', 'NRAS_Q61mut_preeq', 'NRAS_Q61mut_presim',
                 'Vemurafenib_0', 'Vemurafenib_0_preeq', 'Vemurafenib_0_presim',
                 'EGFR_crispr', 'EGFR_crispr_preeq', 'EGFR_crispr_presim'
             ]:
@@ -230,6 +233,7 @@ def read_T_experiment(data, df, specs):
             for val in [
                 'time', 't_presim',
                 'EGF_0', 'EGF_0_preeq', 'EGF_0_presim',
+                'NRAS_Q61mut', 'NRAS_Q61mut_preeq', 'NRAS_Q61mut_presim',
                 'Vemurafenib_0', 'Vemurafenib_0_preeq', 'Vemurafenib_0_presim',
                 'Cobimetinib_0', 'Cobimetinib_0_preeq', 'Cobimetinib_0_presim',
                 'EGFR_crispr', 'EGFR_crispr_preeq', 'EGFR_crispr_presim'
