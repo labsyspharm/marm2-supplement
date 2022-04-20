@@ -89,11 +89,13 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
             'MEKi_NRAS_PRAFi_RAFi_engineered_mutrascomboprediction',
         'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
+    variant = 'MEKi_NRAS_PRAFi_RAFi' if filename.startswith('mutRAS') \
+        else sxs['variant']
     if channel_specific_dusp_binding:
         modifications = 'channelcf_monoobs'
     else:
         modifications = 'channel_monoobs'
-    obj = get_objective(sxs['model_name'], sxs['variant'],
+    obj = get_objective(sxs['model_name'], variant,
                         sxs['dataset'], sxs['threads'],
                         multimodel=True, modifications=modifications,
                         datafile=datasets[filename])
