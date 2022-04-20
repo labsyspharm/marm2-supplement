@@ -103,6 +103,15 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                 )
                 for prafi, rafi, meki, _ in edatas
             ])
+            model.setReinitializationStateIdxs([
+                model.getStateNames().index(state_name)
+                for state_name, drug_name in [
+                    ('PRAFi(raf=None) ** CP', prafi),
+                    ('RAFi(raf=None) ** CP', rafi),
+                    ('MEKi(mek=None) ** CP', meki),
+                ]
+                if drug_name is not None
+            ])
 
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
@@ -539,7 +548,6 @@ def get_edata(dataset, instance, model):
             if len(combo_data):
                 edatas = amici.getEdataFromDataFrame(model, combo_data)
                 for edata in edatas:
-                    edata.reinitializeFixedParameterInitialStates = True
                     edatas_labeled.append((prafi, rafi, meki, edata))
 
         return edatas_labeled
