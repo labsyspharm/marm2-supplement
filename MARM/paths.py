@@ -132,7 +132,5 @@ def dataset_to_instance(dataset):
     return '_'.join(
         pert
         for pert in dataset.split('_')
-        if pert != 'EGFR' and pert != 'mutrastraining'
-        and pert != 'mutrasprediction' and pert != 'acquired'
-        and pert != 'engineered'
+        if pert in ['EGF', 'NRAS', 'RAFi', 'PRAFi', 'MEKi']
     )
