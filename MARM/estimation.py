@@ -105,12 +105,12 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
             ])
             model.setReinitializationStateIdxs([
                 model.getStateNames().index(state_name)
-                for state_name, drug_name in [
-                    ('PRAFi(raf=None) ** CP', prafi),
-                    ('RAFi(raf=None) ** CP', rafi),
-                    ('MEKi(mek=None) ** CP', meki),
+                for state_name in [
+                    'PRAFi(raf=None) ** CP',
+                    'RAFi(raf=None) ** CP',
+                    'MEKi(mek=None) ** CP'
                 ]
-                if drug_name is not None
+                if state_name in model.getStateNames()
             ])
 
             objectives.append(pypesto.objective.AmiciObjective(
