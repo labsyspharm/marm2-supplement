@@ -108,7 +108,8 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                 for state_name in [
                     'PRAFi(raf=None) ** CP',
                     'RAFi(raf=None) ** CP',
-                    'MEKi(mek=None) ** CP'
+                    'MEKi(mek=None) ** CP',
+                    'EGF(rtk=None) ** CP'
                 ]
                 if state_name in model.getStateNames()
             ])
