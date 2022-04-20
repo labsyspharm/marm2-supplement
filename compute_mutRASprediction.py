@@ -31,8 +31,13 @@ optimizer = pypesto.optimize.FidesOptimizer(
 df_parameters = load_parameters_as_dataframe(sxs['model_name'],
                                              sxs['variant'],
                                              sxs['dataset'])
+variants = sxs['variant'].split('_')
+for v in ['EGF', 'EGFR']:
+    if v in variants:
+        variants.remove(v)
+variants += ['NRAS']
 
-problem = get_problem(sxs['model_name'], sxs['variant'],
+problem = get_problem(sxs['model_name'], '_'.join(sorted(variants)),
                       f'MEKi_NRAS_PRAFi_RAFi_{cell_line}_mutrastraining',
                       sxs['threads'])
 

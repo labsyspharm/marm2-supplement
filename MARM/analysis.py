@@ -89,8 +89,16 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
             'MEKi_NRAS_PRAFi_RAFi_engineered_mutrascomboprediction',
         'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
-    variant = 'MEKi_NRAS_PRAFi_RAFi' if filename.startswith('mutRAS') \
-        else sxs['variant']
+    if filename.startswith('mutRAS'):
+        variants = sxs['variant'].split('_')
+        for v in ['EGF', 'EGFR']:
+            if v in variants:
+                variants.remove(v)
+        variants += ['NRAS']
+        variant = '_'.join(sorted(variants))
+    else:
+        variant = sxs['variant']
+
     if channel_specific_dusp_binding:
         modifications = 'channelcf_monoobs'
     else:
