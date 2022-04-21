@@ -93,8 +93,17 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         modifications = 'channelcf_monoobs'
     else:
         modifications = 'channel_monoobs'
+    if filename.startswith('mutRAS'):
+        perts = sxs['dataset'].split('_')
+        for v in ['EGF', 'EGFR']:
+            if v in perts:
+                perts.remove(v)
+        perts += ['NRAS']
+        dataset = '_'.join(sorted(perts))
+    else:
+        dataset = sxs['dataset']
     obj = get_objective(sxs['model_name'], sxs['variant'],
-                        sxs['dataset'], sxs['threads'],
+                        dataset, sxs['threads'],
                         multimodel=True, modifications=modifications,
                         datafile=datasets[filename])
     if par_dict is None:
