@@ -525,7 +525,7 @@ def get_edata(dataset, instance, model):
         for prafi, rafi, meki in itertools.product(
                 PANRAFI + [None], RAFI + [None], MEKI + [None]
         ):
-            combo_data = exp_data[
+            df_drugs = exp_data[
                 pd.concat([
                     exp_data[f'{drug}_0'] > 0
                     if drug is not None
@@ -543,12 +543,14 @@ def get_edata(dataset, instance, model):
                     if drug is None:
                         val = 0.0
                     else:
-                        val = combo_data[f'{drug}_0{suffix}']
-                    combo_data[drug_init + suffix] = val
+                        val = df_drugs[f'{drug}_0{suffix}']
+                    df_drugs[drug_init + suffix] = val
 
-            if len(combo_data):
-                edatas = amici.getEdataFromDataFrame(model, combo_data)
-                for edata in edatas:
+            if len(df_drugs):
+                edatas = amici.getEdataFromDataFrame(model, df_drugs)
+                for ie, edata in enumerate(edatas):
+                    edata.reinitializeFixedParameterInitialStates = True
+                    edata.id = f'{prafi}_{rafi}_{meki}_c{ie}'
                     edatas_labeled.append((prafi, rafi, meki, edata))
 
         return edatas_labeled
