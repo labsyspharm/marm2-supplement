@@ -103,7 +103,7 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                 )
                 for prafi, rafi, meki, _ in edatas
             ])
-            reinit_idx = [
+            reinit_idx = tuple([
                 model.getStateNames().index(state_name)
                 for state_name in [
                     'PRAFi(raf=None) ** CP',
@@ -112,10 +112,10 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                     'EGF(rtk=None) ** CP'
                 ]
                 if state_name in model.getStateNames()
-            ]
+            ])
 
             for edata in edatas:
-                edata.reinitialization_state_idxs_sim = reinit_idx
+                edata[3].reinitialization_state_idxs_sim = reinit_idx
 
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
