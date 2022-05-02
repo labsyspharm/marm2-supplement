@@ -103,7 +103,7 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                 )
                 for prafi, rafi, meki, _ in edatas
             ])
-            model.setReinitializationStateIdxs([
+            reinit_idx = [
                 model.getStateNames().index(state_name)
                 for state_name in [
                     'PRAFi(raf=None) ** CP',
@@ -112,7 +112,10 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
                     'EGF(rtk=None) ** CP'
                 ]
                 if state_name in model.getStateNames()
-            ])
+            ]
+
+            for edata in edatas:
+                edata.reinitialization_state_idxs_sim = reinit_idx
 
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
@@ -549,7 +552,6 @@ def get_edata(dataset, instance, model):
             if len(df_drugs):
                 edatas = amici.getEdataFromDataFrame(model, df_drugs)
                 for ie, edata in enumerate(edatas):
-                    edata.reinitializeFixedParameterInitialStates = True
                     edata.id = f'{prafi}_{rafi}_{meki}_c{ie}'
                     edatas_labeled.append((prafi, rafi, meki, edata))
 
