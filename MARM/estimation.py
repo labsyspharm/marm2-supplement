@@ -368,7 +368,7 @@ def get_problem(model_name, variant, dataset, n_threads, multimodel=True):
 
         elif par.endswith('IF_offset'):
             lb[list(names).index(par)] = -2
-            ub[list(names).index(par)] = -0.5
+            ub[list(names).index(par)] = -1
 
     fixed_idx = []
     fixed_vals = []
