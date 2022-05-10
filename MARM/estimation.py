@@ -116,6 +116,7 @@ def get_objective(model_name, variant, dataset, n_threads, multimodel=True,
 
             for edata in edatas:
                 edata[3].reinitialization_state_idxs_sim = reinit_idx
+                edata[3].reinitialization_state_idxs_presim = reinit_idx
 
             objectives.append(pypesto.objective.AmiciObjective(
                 model,
