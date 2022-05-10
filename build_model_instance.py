@@ -113,20 +113,23 @@ if 'channel' in modifications or 'channelcf' in modifications:
         'baseline_RR',
         BRAF(rafi=None) % BRAF(rafi=None) +
         CRAF(rafi=None) % BRAF(rafi=None) +
-        CRAF(rafi=None) % CRAF(rafi=None)
+        CRAF(rafi=None) % CRAF(rafi=None),
+        match='species'
     )
     pysb.Observable(
         'baseline_RRI',
         BRAF(rafi=pysb.ANY) % BRAF(rafi=None) +
         BRAF(rafi=pysb.ANY) % CRAF(rafi=None) +
         BRAF(rafi=None) % CRAF(rafi=pysb.ANY) +
-        CRAF(rafi=pysb.ANY) % CRAF(rafi=None)
+        CRAF(rafi=pysb.ANY) % CRAF(rafi=None),
+        match='species'
     )
     pysb.Observable(
         'baseline_IRRI',
         BRAF(rafi=pysb.ANY) % BRAF(rafi=pysb.ANY)
         + BRAF(rafi=pysb.ANY) % CRAF(rafi=pysb.ANY)
-        + CRAF(rafi=pysb.ANY) % CRAF(rafi=pysb.ANY)
+        + CRAF(rafi=pysb.ANY) % CRAF(rafi=pysb.ANY),
+        match='species'
     )
     pysb.Observable('RAF_marginal_RAFi', BRAF(rafi=pysb.ANY) + CRAF(rafi=pysb.ANY))
     pysb.Observable('RAF_marginal_RAS', BRAF(RBD=pysb.ANY) + CRAF(RBD=pysb.ANY))
