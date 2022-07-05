@@ -19,19 +19,19 @@ perturbations = ''
 drug_label = f'{drug.replace("_", "")} [$\mu$M]'
 df = read_all_analysis_dataframes(sxs, f'transduction__{drug}__{perturbations}')
 
-states = ['RAF_marginal_RAFi', 'RAF_marginal_RAS', 'RAF_marginal_MEK',
-          'RAF_marginal_RAF',
-          'baseline_R', 'baseline_IR', 'baseline_RR', 'baseline_RRI',
-          'baseline_IRRI']
-
-total_RAF = df[['baseline_R', 'baseline_IR']].sum(axis=1) + 2 * \
-    df[['baseline_RRI', 'baseline_IRRI']].sum(axis=1)
-
-for state in states:
-    if state in df.columns:
-        df[state] = df[state].div(total_RAF, axis=0)
-
 if drug in RAFI + PANRAFI:
+    states = ['RAF_marginal_RAFi', 'RAF_marginal_RAS', 'RAF_marginal_MEK',
+              'RAF_marginal_RAF',
+              'baseline_R', 'baseline_IR', 'baseline_RR', 'baseline_RRI',
+              'baseline_IRRI']
+
+    total_RAF = df[['baseline_R', 'baseline_IR']].sum(axis=1) + 2 * \
+                df[['baseline_RRI', 'baseline_IRRI']].sum(axis=1)
+
+    for state in states:
+        if state in df.columns:
+            df[state] = df[state].div(total_RAF, axis=0)
+
     plot_raf_states(df, f'{drug}_0', drug_label, figdir,
                     f'rafstates_{drug}_{perturbations}.pdf')
 
