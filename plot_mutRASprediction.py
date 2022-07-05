@@ -107,7 +107,7 @@ plot_simdata_grid(
     ylimits=YLIM, logx=True, logy=False, group='NRAS_Q61mut',
     color='NRAS_Q61mut',
     figdir=figdir,
-    filename=f'prediction_NRASmu_{cell_line}_drComibimetinib_'
+    filename=f'prediction_NRASmut_{cell_line}_drComibimetinib_'
              f'Vemurafenib1.0.pdf',
 )
 
@@ -137,6 +137,7 @@ groupvars = ['time', 'Vemurafenib_0', 'Cobimetinib_0', 'LY3009120_0',
 
 df_sim_melt = average_over_par_index(df_sim_obs, groupvars)
 df_melt = pd.concat([df_sim_melt, df_data_obs[groupvars + ['value']]])
+df_melt.loc[df_melt.NRAS_Q61mut.isna(), 'NRAS_Q61mut'] = 0.0
 
 drugb = 'Cobimetinib'
 drugb_0 = f'{drugb}_0'
