@@ -24,8 +24,8 @@ states = ['RAF_marginal_RAFi', 'RAF_marginal_RAS', 'RAF_marginal_MEK',
           'baseline_R', 'baseline_IR', 'baseline_RR', 'baseline_RRI',
           'baseline_IRRI']
 
-total_RAF = df['baseline_R', 'baseline_IR'].sum(axis=1) + 2 * \
-    df['baseline_IRR', 'baseline_IRRI'].sum(axis=1)
+total_RAF = df[['baseline_R', 'baseline_IR']].sum(axis=1) + 2 * \
+    df[['baseline_RRI', 'baseline_IRRI']].sum(axis=1)
 
 for state in states:
     if state in df.columns:
