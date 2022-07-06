@@ -91,7 +91,19 @@ if 'RAFi_0' in model.getFixedParameterNames():
 model.setFixedParameterByName('EGFR_crispr', 1.0)
 
 edata = amici.ExpData(model.get())
-edata.reinitializeFixedParameterInitialStates = True
+reinit_idx = tuple([
+    model.getStateNames().index(state_name)
+    for state_name in [
+        'PRAFi(raf=None) ** CP',
+        'RAFi(raf=None) ** CP',
+        'MEKi(mek=None) ** CP',
+        'EGF(rtk=None) ** CP'
+    ]
+    if state_name in model.getStateNames()
+])
+
+edata.reinitialization_state_idxs_sim = reinit_idx
+edata.reinitialization_state_idxs_presim = reinit_idx
 edata.t_presim = 0.0
 fp = list(edata.fixedParameters)
 fp[model.getFixedParameterNames().index('EGF_0')] = 0.0

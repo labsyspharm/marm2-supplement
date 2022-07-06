@@ -12,3 +12,4 @@ MARM/observables/*
 MARM/pysb_flat/*
 .ipynb_checkpoints/*
 *.pdf
+.DS_Store
