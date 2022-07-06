@@ -77,7 +77,7 @@ rule multistart_estimation:
 rule multimodel_benchmark:
     input:
         os.path.join(
-            get_results_path('RTKERK', 'base'),
+            get_results_path('RTKERK', 'pRAF'),
             'EGF_EGFR_MEKi_PRAFi_RAFi_multimodel_benchmark.csv'
         )
 
