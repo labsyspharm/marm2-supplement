@@ -74,6 +74,8 @@ for condition in ['observed', 'preequilibration', 'log', 'egfra',
         + scale_y_log10(limits=(1e0, 5e5))
     )
 
+
+
     for quantile_range in np.linspace(0.2, 0.8, 4):
         up = 0.5 + quantile_range / 2
         lp = 0.5 - quantile_range / 2
@@ -82,7 +84,9 @@ for condition in ['observed', 'preequilibration', 'log', 'egfra',
                              fun_ymax=lambda x: np.quantile(x, up),
                              geom='ribbon', alpha=0.2, color=None)
 
-    if condition not in ['observed', 'egfra']:
+    if condition == 'preequilibration':
+        plot += scale_x_log10(limits=(1e-1, 1e2))
+    elif condition not in ['observed', 'egfra']:
         plot += scale_x_log10()
 
     plot_and_save_fig(plot, figdir,

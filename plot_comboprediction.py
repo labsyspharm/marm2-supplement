@@ -187,22 +187,22 @@ for egfr_state, time, egfr_label in zip(
     del df_edata
     del df_rdata
 
-df_edata = df[df.datatype == 'data']
-df_rdata = df[df.datatype == 'simulation']
+    df_edata = df[df.datatype == 'data']
+    df_rdata = df[df.datatype == 'simulation']
 
-for frame in [df_edata, df_rdata]:
-    for drug_0, name in zip([rafi_0, meki_0], [rafi, meki]):
-        frame.loc[frame[drug_0] == drug_zero[name], drug_0] = 0.0
+    for frame in [df_edata, df_rdata]:
+        for drug_0, name in zip([rafi_0, meki_0], [rafi, meki]):
+            frame.loc[frame[drug_0] == drug_zero[name], drug_0] = 0.0
 
-for measure in ['bliss', 'hsa']:
-    for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
-        plot_synergies(
-            df_edata, df_rdata,
-            kind='bliss_nn' if measure == 'bliss' and marker == 'pERK_phys_obs'
-            else measure,
-            rafi_0=rafi_0, meki_0=meki_0, marker=marker)
-        plt.savefig(os.path.join(
-            figdir, f'doseresponse_{rafi}_{meki}_{measure}_{marker}.pdf'
-        ))
+    for measure in ['bliss', 'hsa']:
+        for marker in ['pERK_IF_obs', 'pERK_onco_obs', 'pERK_phys_obs']:
+            plot_synergies(
+                df_edata, df_rdata,
+                kind='bliss_nn' if measure == 'bliss' and marker == 'pERK_phys_obs'
+                else measure,
+                rafi_0=rafi_0, meki_0=meki_0, marker=marker)
+            plt.savefig(os.path.join(
+                figdir, f'doseresponse_{rafi}_{meki}_{measure}_{marker}_{egfr_label}.pdf'
+            ))
 
 write_timestamp(figdir, 'comboprediction')
