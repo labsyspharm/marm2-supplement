@@ -139,6 +139,10 @@ if 'channel' in modifications or 'channelcf' in modifications:
     pysb.Observable('inhibited_uMEK', MEK(meki=pysb.ANY, phospho='u'))
     pysb.Observable('drugfree_pMEK', MEK(meki=None, phospho='p'))
     pysb.Observable('inhibited_pMEK', MEK(meki=pysb.ANY, phospho='p'))
+    pysb.Observable('drugfree_pMEK_phys', MEK(meki=None, phospho='p', channel='phys'))
+    pysb.Observable('inhibited_pMEK_phys', MEK(meki=pysb.ANY, phospho='p', channel='phys'))
+    pysb.Observable('drugfree_pMEK_onco', MEK(meki=None, phospho='p', channel='onco'))
+    pysb.Observable('inhibited_pMEK_onco', MEK(meki=pysb.ANY, phospho='p', channel='onco'))
 
     if 'channelcf' in modifications:
         model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']
