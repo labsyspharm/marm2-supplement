@@ -9,7 +9,7 @@ from MARM.visualize import (
     plot_gains, plot_deconvolution,  plot_contextualized_graph,
     plot_raf_states, plot_drug_free_monomers, plot_raf_dimerization,
 )
-from MARM.estimation import RAFI, PANRAFI
+from MARM.estimation import RAFI, PANRAFI, MEKI
 
 sxs = read_settings(sys.argv, index=False, threads=False)
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
