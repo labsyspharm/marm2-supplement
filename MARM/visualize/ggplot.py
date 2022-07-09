@@ -866,7 +866,8 @@ def plot_entropy(df_melt, figdir, figname):
     plot_and_save_fig(plot, figdir, figname)
 
 
-def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename):
+def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename,
+                            channel=False):
     df_drug_free = copy.deepcopy(df)
 
     drug = iterator.replace('_0', '')
@@ -895,17 +896,21 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename):
 
         values = ['drug_free_dimeric_raf', 'drug_free_monomeric_raf']
     elif drug in MEKI:
-        pmek = ['drugfree_pMEK', 'inhibited_pMEK']
-        umek = ['drugfree_uMEK', 'inhibited_uMEK']
+        if not channel:
+            meks1 = ['drugfree_pMEK', 'inhibited_pMEK']
+            meks2 = ['drugfree_uMEK', 'inhibited_uMEK']
+            values = ['drugfree_uMEK', 'drugfree_pMEK']
+        else:
+            meks1 = [f'drugfree_pMEK_phys', f'inhibited_pMEK_phys']
+            meks2 = [f'drugfree_pMEK_onco', f'inhibited_pMEK_onco']
+            values = ['drugfree_pMEK_phys', 'drugfree_pMEK_onco']
 
-        for meks in umek, pmek:
+        for meks in meks1, meks2:
             df_drug_free[meks] = \
                 df_drug_free[meks].div(
                     df_drug_free[meks].sum(axis=1),
                     axis=0
                 )
-
-        values = ['drugfree_uMEK', 'drugfree_pMEK']
     else:
         raise ValueError(f'invalid iterator {iterator}')
 
