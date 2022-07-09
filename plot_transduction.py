@@ -37,6 +37,10 @@ if drug in RAFI + PANRAFI:
 
 plot_drug_free_monomers(df, f'{drug}_0', drug_label, figdir,
                         f'drugfree_{drug}_{perturbations}.pdf')
+if drug in MEKI:
+    plot_drug_free_monomers(df, f'{drug}_0', drug_label, figdir,
+                            f'drugfree_{drug}_{perturbations}_channel.pdf',
+                            channel=True)
 plot_raf_dimerization(df, f'{drug}_0', drug_label, figdir,
                       f'dimerization_{drug}_{perturbations}.pdf')
 
