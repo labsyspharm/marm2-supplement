@@ -260,7 +260,7 @@ for suffix in '', '_cf':
         df_data_obs.query('time == 0').query('EGFR_crispr == 1.0').query('t_presim == 0.0'),
         df_sim_obs.query('time == 0').query('EGFR_crispr == 1.0').query('t_presim == 0.0'),
         tm_obs, rafi_0, rafi_label, 'log10(transcript abundance) [FPKM]',
-        ylimits=(1, 6), logy=False, height_scale=0.5,
+        ylimits=(1, 7), logy=False, height_scale=0.5,
         figdir=figdir,
         filename=f'training{suffix}_transcriptomics_dr{rafi}.pdf'
     )
@@ -271,7 +271,7 @@ for suffix in '', '_cf':
         df_sim_obs.query(f'{rafi_0} == 1.0').query('EGFR_crispr == 1.0').query(
             'EGF_0 == 100').query('t_presim == 0.0'),
         tm_obs, 'time', TIMELABEL, 'log10(transcript abundance) [FPKM]',
-        ylimits=(1, 6), xlimits=(0, 10), logy=False, logx=False,
+        ylimits=(1, 7), xlimits=(0, 10), logy=False, logx=False,
         height_scale=0.5, figdir=figdir,
         filename=f'training{suffix}_transcriptomics_tc.pdf'
     )
