@@ -109,5 +109,8 @@ which was used to generate graphs for Figure EV2.
 Figures 1B,C were generated using the `Model Statistics.ipynb` notebook.
 Figures 1D,E were generated using the `Speedup.ipynb` notebook.
 Figure 2D was generated using the `Stastistics Channels.ipynb` notebook.
+The `Drug Effects.ipynb` notebook was used to compute analyse drug-specific 
+parameters presented in the Section "MAPK Signaling is Rewired by Drug 
+Adaptation and Direct Inhibition".
 
 
