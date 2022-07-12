@@ -802,7 +802,7 @@ def plot_gains(df, x_axis, x_label, figdir, filename):
             + scale_color_cmap_d(name='tab10')
             + scale_fill_cmap_d(name='tab10')
             + scale_x_continuous(expand=(0.01, 0.0))
-            + scale_y_continuous(ylim=(0, 2), expand=(0.01, 0.0))
+            + scale_y_continuous(ylim=(0, 2.25), expand=(0.01, 0.0))
             + facet_grid(('step', '.',),
                          labeller='label_context')
     )
@@ -1064,9 +1064,6 @@ def log_breaks_labels(breaks, indexvar):
 
 def plot_and_save_fig(plot, figdir, filename):
     plt.tight_layout()
-    for ax in plot.axes:
-        for col in ax.collections:
-            col.set_clip_on(False)
     if figdir is None:
         figdir = os.path.join(os.getcwd(), 'figures')
 
