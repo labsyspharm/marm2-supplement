@@ -894,7 +894,7 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename,
                 axis=0
             )
 
-        values = ['drug_free_dimeric_raf', 'drug_free_monomeric_raf']
+        values = ['drug_free_monomeric_raf', 'drug_free_dimeric_raf']
     elif drug in MEKI:
         if not channel:
             meks1 = ['drugfree_pMEK', 'inhibited_pMEK']
@@ -903,7 +903,7 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename,
         else:
             meks1 = [f'drugfree_pMEK_phys', f'inhibited_pMEK_phys']
             meks2 = [f'drugfree_pMEK_onco', f'inhibited_pMEK_onco']
-            values = ['drugfree_pMEK_phys', 'drugfree_pMEK_onco']
+            values = ['drugfree_pMEK_onco', 'drugfree_pMEK_phys']
 
         for meks in meks1, meks2:
             df_drug_free[meks] = \
@@ -916,6 +916,8 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename,
 
     df_melt = pd.melt(df_drug_free, id_vars=[iterator, 'par_index'],
                       value_vars=values)
+    df_melt.variable = pd.Categorical(df_melt.variable, ordered=True,
+                                      categories=values)
 
     plot = (
         ggplot(df_melt,
@@ -924,7 +926,7 @@ def plot_drug_free_monomers(df, iterator, xlabel, figdir, filename,
         + xlab(xlabel)
         + scale_x_log10(expand=(0.01, 0.0))
         + ylab(f'drug free {iterator.replace("i_0","")} molecules')
-        + scale_y_continuous(expand=(0.01, 0.0))
+        + scale_y_continuous(expand=(0.01, 0.0), limits=(0.0, 1.0))
         + scale_color_cmap_d(name='tab10')
         + scale_fill_cmap_d(name='tab10')
         + theme('minimal', figure_size=(
