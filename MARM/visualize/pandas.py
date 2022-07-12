@@ -539,7 +539,8 @@ def plot_synergies(df_edata, df_rdata, rafi_0, meki_0,
     fig.colorbar(im, label=f'excess over {kind}')
 
 
-def plot_isobologram(df, time, egf, rafi_0, meki_0, ax, vmax=2):
+def plot_isobologram(df, time, egf, rafi_0, meki_0, ax, vmax=2,
+                     linscale=False):
     df = df[(df.time == time) & (df.EGF_0 == egf)].copy()
 
     rafi_concs = df[rafi_0].unique()
@@ -557,17 +558,23 @@ def plot_isobologram(df, time, egf, rafi_0, meki_0, ax, vmax=2):
         ].median()
 
     smooth_response = scipy.ndimage.filters.gaussian_filter(response, 0.75)
-    #ax.set_aspect(1)
-    x, y = np.meshgrid(meki_concs, rafi_concs)
-    return ax.contour(x, y, smooth_response, cmap='viridis', origin='lower',
-                      vmin=0, vmax=vmax, levels=10)
+    if linscale:
+        x, y = np.meshgrid(meki_concs, rafi_concs)
+        return ax.contour(x, y, smooth_response, cmap='viridis',
+                          origin='lower', vmin=0, vmax=vmax, levels=10)
+    else:
+        ax.set_aspect(1)
+        return ax.contour(smooth_response, cmap='viridis',
+                          origin='lower', vmin=0, vmax=vmax, levels=10)
 
 
 def plot_isobolograms(df_edata, df_rdata, meki_0, rafi_0, time=8, egf=100,
-                      vmax=2):
+                      vmax=2, linscale=False):
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 10))
 
     plot_isobologram(df_edata, time=time, egf=egf, ax=axes[0],
-                     rafi_0=rafi_0, meki_0=meki_0, vmax=vmax)
+                     rafi_0=rafi_0, meki_0=meki_0, vmax=vmax,
+                     linscale=linscale)
     plot_isobologram(df_rdata, time=time, egf=egf, ax=axes[1],
-                     rafi_0=rafi_0, meki_0=meki_0, vmax=vmax)
+                     rafi_0=rafi_0, meki_0=meki_0, vmax=vmax,
+                     linscale=linscale)
