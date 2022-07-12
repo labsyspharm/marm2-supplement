@@ -197,7 +197,7 @@ if 'monoobs' in modifications:
     MARM.model.add_monomer_configuration_observables(model)
 
 MARM.model.cleanup_unused(model)
-MARM.model.export_model(model, ['pysb_flat', 'bngl'])
+MARM.model.export_model(model, ['pysb_flat', 'bngl', 'sbml'])
 MARM.model.generate_equations(model)
 MARM.model.write_observable_function(model)
 os.environ["AMICI_IMPORT_NPROCS"] = '4'
