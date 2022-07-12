@@ -1064,6 +1064,9 @@ def log_breaks_labels(breaks, indexvar):
 
 def plot_and_save_fig(plot, figdir, filename):
     plt.tight_layout()
+    for ax in plot.axes:
+        for col in ax.collections:
+            col.set_clip_on(False)
     if figdir is None:
         figdir = os.path.join(os.getcwd(), 'figures')
 
