@@ -16,7 +16,7 @@ model = get_model(sxs['model_name'],
                   'channel_monoobs')
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
 
-YLIM = (-0.15, 2.25)
+YLIM = (-0.2, 2.25)
 
 for suffix in '', '_cf':
     df = read_all_analysis_dataframes(sxs, 'singleprediction' + suffix)
