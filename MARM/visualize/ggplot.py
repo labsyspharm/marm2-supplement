@@ -808,14 +808,14 @@ def plot_gains(df, x_axis, x_label, figdir, filename):
             + scale_color_cmap_d(name='tab10')
             + scale_fill_cmap_d(name='tab10')
             + scale_x_continuous(expand=(0.01, 0.0))
-            + scale_y_continuous(ylim=(0, 4), expand=(0.01, 0.0))
+            + scale_y_continuous(ylim=(0, 6), expand=(0.01, 0.0))
             + facet_grid(('step', '.',),
                          labeller='label_context')
     )
 
     plot = median_with_uncertainty(plot)
 
-    set_xy_scale(plot, False, True, False, '', '', (0, 4), None, None,
+    set_xy_scale(plot, False, True, False, '', '', (0, 6), None, None,
                  adapt_color_scale=False, adapt_fill_scale=False, expand=False)
 
     plot_and_save_fig(plot, figdir, filename)
