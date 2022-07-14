@@ -108,7 +108,6 @@ def plot_simdatadecomp_grid(
     data.variable = pd.Categorical(data.variable, ordered=True,
                                    categories=obs)
 
-
     plot = (
             ggplot()
             + xlab(xlabel)
@@ -137,8 +136,8 @@ def plot_simdatadecomp_grid(
                     sim_stacked.loc[val, 'value'] += \
                         sim_stacked.loc[base_val, 'value'].values[0]
 
-    sim_stacked.variable = sim_stacked.Categorical(data.variable, ordered=True,
-                                                   categories=obs)
+    sim_stacked.variable = pd.Categorical(sim_stacked.variable, ordered=True,
+                                          categories=obs)
 
     plot = plot + stat_summary(data=sim_stacked,
                                mapping=minus_keys(mapping_sim, ['color']),
