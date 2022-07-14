@@ -656,7 +656,7 @@ def get_signal_transduction_df(sxs, filename, frame_filter, iterators, mode):
 
     for var in ['step', 'channel']:
         df_melt[var] = df_melt.variable.apply(
-            lambda x: steps.get(x, {'step': 0, 'channel': 'phys'})[var]
+            lambda x: steps.get(x, {'step': 4, 'channel': 'phys'})[var]
         )
 
     return df_melt
