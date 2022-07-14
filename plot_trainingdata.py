@@ -133,7 +133,7 @@ for suffix in '', '_cf':
 
     filter_generic = lambda f: ((f['time'] == 8.0) & (f['EGFR_crispr'] > 1.0))
 
-    for drug in ['Vemurafenib', 'Dabrafenib', 'LY3009120',
+    for drug in ['Vemurafenib', 'Dabrafenib', 'LY3009120', 'AZ_628',
                  'Trametinib', 'Cobimetinib']:
 
         label = f'{drug.replace("_", "")} [$\mu$M]'
