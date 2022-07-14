@@ -636,6 +636,10 @@ def get_signal_transduction_df(sxs, filename, frame_filter, iterators, mode):
                 df_trans['RASgtp_to_phys pMEK'] * \
                 df_trans['phys pMEK_to_phys pERK']
 
+            df_trans['BRAFV600E_to_onco pERK'] = \
+                df_trans['BRAFV600E_to_onco pMEK'] * \
+                df_trans['onco pMEK_to_onco pERK']
+
             transductions.append(df_trans)
         except FileNotFoundError as err:
             print(f'missing data for index {par_index} ({str(err)}')
@@ -656,7 +660,9 @@ def get_signal_transduction_df(sxs, filename, frame_filter, iterators, mode):
 
     for var in ['step', 'channel']:
         df_melt[var] = df_melt.variable.apply(
-            lambda x: steps.get(x, {'step': 4, 'channel': 'phys'})[var]
+            lambda x: steps.get(x, {
+                'step': 4, 'channel': 'phys' if 'phys' in x else 'onco'
+            })[var]
         )
 
     return df_melt
