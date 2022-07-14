@@ -22,7 +22,7 @@ model = get_model(sxs['model_name'], sxs['variant'], 'MEKi_NRAS_PRAFi_RAFi',
 figdir = get_figure_dir(sxs['model_name'], sxs['variant'], sxs['dataset'])
 
 cell_line = 'engineered'
-YLIM = (-0.15, 2.25)
+YLIM = (-0.2, 2.25)
 
 df = read_all_analysis_dataframes(sxs, f'mutRASprediction_{cell_line}')
 
