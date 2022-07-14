@@ -816,7 +816,7 @@ def plot_gains(df, x_axis, x_label, figdir, filename):
 
     plot = median_with_uncertainty(plot)
 
-    set_xy_scale(plot, False, True, False, '', '', (0, 2.0), None, None,
+    set_xy_scale(plot, False, True, False, '', '', (0, 2.25), None, None,
                  adapt_color_scale=False, adapt_fill_scale=False, expand=False)
 
     plot_and_save_fig(plot, figdir, filename)
