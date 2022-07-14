@@ -756,7 +756,7 @@ def get_graph_nodes(colors):
             'color': colors['phys']
         },
         {
-            'nodes': ['BRAF600E'],
+            'nodes': ['BRAFV600E'],
             'fillstyle': 'full',
             'color': colors['onco']
         },
@@ -774,7 +774,7 @@ def get_graph_pos(deltax_outer, deltay_aligned, deltay_unaligned):
         'RASgtp': (-deltax_outer, deltay_unaligned),
         'phys pMEK': (0, 0),
         'phys pERK': (0, -deltay_aligned),
-        'BRAF600E': (deltax_outer, deltay_unaligned),
+        'BRAFV600E': (deltax_outer, deltay_unaligned),
         'onco pMEK': (0, 0),
         'onco pERK': (0, -deltay_aligned),
     }
@@ -787,7 +787,7 @@ def plot_contextualized_graph(df, iterator, n_plots, figdir, figname,
     groupvars = [iterator, 'variable', 'step', 'channel']
     df_transduction_melt = pd.DataFrame([
         dict(value=values.value.median(), **dict(zip(groupvars, cond)))
-        for cond, values in df.groupby(groupvars)
+        for cond, values in df[df.step<4].groupby(groupvars)
     ])
     df_transduction = df_transduction_melt.pivot(index=iterator,
                                                  columns='variable')
