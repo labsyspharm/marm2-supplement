@@ -133,8 +133,8 @@ for suffix in '', '_cf':
 
     filter_generic = lambda f: ((f['time'] == 8.0) & (f['EGFR_crispr'] > 1.0))
 
-    for drug in ['Vemurafenib', 'Dabrafenib', 'LY3009120', 'AZ_628',
-                 'Trametinib', 'Cobimetinib']:
+    for drug in ['Vemurafenib', 'Dabrafenib', 'Trametinib', 'Cobimetinib'] \
+            + PANRAFI:
 
         label = f'{drug.replace("_", "")} [$\mu$M]'
 
@@ -153,21 +153,22 @@ for suffix in '', '_cf':
             filename=f'training{suffix}_EGFRa_dr{drug}.pdf',
         )
 
-        filter_specific = lambda f: pd.concat([
-            (f[f'{zdrug}_0'] == drug_zeros[zdrug])
-            for zdrug in RAFI + PANRAFI + MEKI
-            if zdrug != drug and zdrug in drug_zeros
-        ], axis=1).all(axis=1) & (f['EGF_0'] == 100.0)
+        if drug not in PANRAFI:
+            filter_specific = lambda f: pd.concat([
+                (f[f'{zdrug}_0'] == drug_zeros[zdrug])
+                for zdrug in RAFI + PANRAFI + MEKI
+                if zdrug != drug and zdrug in drug_zeros
+            ], axis=1).all(axis=1) & (f['EGF_0'] == 100.0)
 
-        plot_simdatadecomp_grid(
-            apply_filters(df_data_obs, filter_generic, filter_specific),
-            apply_filters(df_sim_obs, filter_generic, filter_specific),
-            if_obs, a_obs + ['pMEK_background_obs', 'pERK_background_obs'],
-            f'{drug}_0', xlabel=label, ylabel=IFLABEL,
-            ylimits=YLIM, logx=True, logy=False,
-            figdir=figdir,
-            filename=f'training{suffix}_EGFRa_dr{drug}_decomp.pdf',
-        )
+            plot_simdatadecomp_grid(
+                apply_filters(df_data_obs, filter_generic, filter_specific),
+                apply_filters(df_sim_obs, filter_generic, filter_specific),
+                if_obs, a_obs + ['pMEK_background_obs', 'pERK_background_obs'],
+                f'{drug}_0', xlabel=label, ylabel=IFLABEL,
+                ylimits=YLIM, logx=True, logy=False,
+                figdir=figdir,
+                filename=f'training{suffix}_EGFRa_dr{drug}_decomp.pdf',
+            )
 
     rafi = 'Vemurafenib'
     rafi_label = f'Vemurafenib [$\mu$M]'
