@@ -506,7 +506,7 @@ def signaling_steps():
         ('RASgtp', 'active EGFR',  {'type': 'phys', 'normfun': conc_max}),
         ('phys pMEK', 'RASgtp',    {'type': 'phys', 'normfun': conc_min}),
         ('phys pERK', 'phys pMEK', {'type': 'phys', 'normfun': conc_min}),
-        ('onco pMEK', 'BRAF600E',  {'type': 'onco', 'normfun': conc_min}),
+        ('onco pMEK', 'BRAFV600E',  {'type': 'onco', 'normfun': conc_min}),
         ('onco pERK', 'onco pMEK', {'type': 'onco', 'normfun': conc_min}),
     ]
 
@@ -527,7 +527,7 @@ def node_species(df, concs=False):
         'active EGFR': [col for col in df.columns
                         if col.startswith('expl_EGFR') and 'Tyrp' in col]
         if concs else ['activeEGFR_obs'],
-        'BRAF600E': ['tBRAF']
+        'BRAFV600E': ['tBRAF']
         if concs else ['tBRAF_obs'],
         'RASgtp': ['gtpRAS']
         if concs else ['gtpRAS_obs'],
@@ -549,7 +549,7 @@ def node_species(df, concs=False):
 def node_order():
     return {
         'active EGFR': 0,
-        'BRAF600E': 1,
+        'BRAFV600E': 1,
         'RASgtp': 1,
         'onco pMEK': 2,
         'phys pMEK': 2,
@@ -563,7 +563,7 @@ def node_order():
 def node_channel():
     return {
         'active EGFR': 'phys',
-        'BRAF600E': 'onco',
+        'BRAFV600E': 'onco',
         'RASgtp': 'phys',
         'onco pMEK': 'onco',
         'phys pMEK': 'phys',
