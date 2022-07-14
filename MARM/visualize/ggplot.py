@@ -105,6 +105,9 @@ def plot_simdatadecomp_grid(
         **base_mappings,
     )
 
+    data.variable = pd.Categorical(df.variable, ordered=True,
+                                   categories=obs)
+
     plot = (
             ggplot()
             + xlab(xlabel)
