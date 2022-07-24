@@ -193,6 +193,26 @@ if 'channel' in modifications or 'channelcf' in modifications:
                     mp.site_conditions['erk_onco'] = condition
                     mp.site_conditions['erk_phys'] = condition
 
+        ep_name = 'ep_bind_DUSP_pERK'
+        ep_onco = model.energypatterns[ep_name]
+
+        ep_phys = copy.deepcopy(ep_onco)
+        ep_onco.rename(f'{ep_onco.name}_onco')
+        model.add_component(ep_phys)
+        ep_phys.rename(f'{ep_phys.name}_phys')
+
+        for ep, channel in zip(
+            [ep_onco, ep_phys], ['onco', 'phys']
+        ):
+
+            for mp in ep.pattern.monomer_patterns:
+                if mp.monomer.name != 'DUSP':
+                    continue
+                if 'erk' not in mp.site_conditions:
+                    continue
+                state = mp.site_conditions.pop('erk')
+                mp.site_conditions[f'erk_{channel}'] = state
+
 if 'monoobs' in modifications:
     MARM.model.add_monomer_configuration_observables(model)
 
