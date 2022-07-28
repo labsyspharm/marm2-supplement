@@ -879,40 +879,40 @@ if __name__ == '__main__':
     else:
         data = load_experiment(DATAFILES_ESTIMATION)
 
-    data = filter_experiments(data, instances)
-    data.loc[data.time == 0.083, 'time'] = 0.0833
-
-    bio_repl = data[(data.Vemurafenib_0 > 0) &
-                    (data.EGFR_crispr == 1.0) &
-                    (data.t_presim == 0.0) &
-                    (data.time == 0.0833)]
-
-    bio_repl_no_egf = bio_repl[bio_repl.EGF_0 == 0.0]
-    bio_repl_egf = bio_repl[bio_repl.EGF_0 == 0.0]
-    for d in [bio_repl_no_egf, bio_repl_egf]:
-        xx = d.Vemurafenib_0.values
-        yy = d.pERK_IF_obs.values
-
-        def hill(p):
-            return p[2] - (p[2] - p[0]) / (1 + (10 ** p[1] / xx)) - yy
-
-        def hill_jac(p):
-            return np.vstack([
-                1 / (1 + (10 ** p[1] / xx)),
-                + (p[2] - p[0]) * 10 ** p[1] * xx * np.log(10) /
-                np.power(xx + 10 ** p[1], 2),
-                1 - 1 / (1 + (10 ** p[1] / xx))
-            ]).T
-
-        p0 = np.asarray([0.5,
-                         np.median(np.log10(xx)),
-                         min([max([yy[0], 0]), 2.5])])
-
-        res = least_squares(hill, p0, hill_jac,
-                            bounds=([0, np.min(np.log10(xx)), 0],
-                                    [1.5, np.max(np.log10(xx)), 2.5]))
-
-        yy_fit = hill(res.x)
+    # data = filter_experiments(data, instances)
+    # data.loc[data.time == 0.083, 'time'] = 0.0833
+    #
+    # bio_repl = data[(data.Vemurafenib_0 > 0) &
+    #                 (data.EGFR_crispr == 1.0) &
+    #                 (data.t_presim == 0.0) &
+    #                 (data.time == 0.0833)]
+    #
+    # bio_repl_no_egf = bio_repl[bio_repl.EGF_0 == 0.0]
+    # bio_repl_egf = bio_repl[bio_repl.EGF_0 == 0.0]
+    # for d in [bio_repl_no_egf, bio_repl_egf]:
+    #     xx = d.Vemurafenib_0.values
+    #     yy = d.pERK_IF_obs.values
+    #
+    #     def hill(p):
+    #         return p[2] - (p[2] - p[0]) / (1 + (10 ** p[1] / xx)) - yy
+    #
+    #     def hill_jac(p):
+    #         return np.vstack([
+    #             1 / (1 + (10 ** p[1] / xx)),
+    #             + (p[2] - p[0]) * 10 ** p[1] * xx * np.log(10) /
+    #             np.power(xx + 10 ** p[1], 2),
+    #             1 - 1 / (1 + (10 ** p[1] / xx))
+    #         ]).T
+    #
+    #     p0 = np.asarray([0.5,
+    #                      np.median(np.log10(xx)),
+    #                      min([max([yy[0], 0]), 2.5])])
+    #
+    #     res = least_squares(hill, p0, hill_jac,
+    #                         bounds=([0, np.min(np.log10(xx)), 0],
+    #                                 [1.5, np.max(np.log10(xx)), 2.5]))
+    #
+    #     yy_fit = hill(res.x)
 
     # np.sqrt(np.mean(np.power(data.pERK_IF_obs_std,2))) = 0.05
     data['pERK_IF_obs_std'] = 0.05
