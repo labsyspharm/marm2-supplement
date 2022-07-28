@@ -879,9 +879,9 @@ if __name__ == '__main__':
     else:
         data = load_experiment(DATAFILES_ESTIMATION)
 
-    # data = filter_experiments(data, instances)
-    # data.loc[data.time == 0.083, 'time'] = 0.0833
-    #
+    data = filter_experiments(data, instances)
+    data.loc[data.time == 0.083, 'time'] = 0.0833
+
     # bio_repl = data[(data.Vemurafenib_0 > 0) &
     #                 (data.EGFR_crispr == 1.0) &
     #                 (data.t_presim == 0.0) &
