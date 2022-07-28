@@ -799,7 +799,8 @@ def load_experiment(IDs):
                         data_dict.update({
                             'pMEK_IF_obs': df_MEK.values[row, mean_anchor +
                                                          conc_idx],
-                            'pMEK_IF_obs_std': pMEK_IF_std,
+                            'pMEK_IF_obs_std': df_MEK.values[row, std_anchor +
+                                                             conc_idx],
                         })
 
                     for key in data.columns.values:
