@@ -161,6 +161,9 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
                 else:
                     continue
 
+                if xname == 'ERK_0':
+                    continue
+
                 par_diff = np.exp(x_diff)
                 print(f'multiplying parameter {xname} by {par_diff} for '
                       f'cell line ht29')
