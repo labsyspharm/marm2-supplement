@@ -6,6 +6,7 @@ import re
 import MARM
 
 from MARM.estimation import RAFI, MEKI, PANRAFI
+from scipy.optimize import least_squares
 
 DATAFILES_ESTIMATION = ['D1', 'D4', 'D5', 'D6', 'D7', 'D8', 'DP1', 'DP2',
                         'DT1', 'DT2', 'DT3']
@@ -22,9 +23,6 @@ DATAFILES_MUTRAS_ENGINEERED_COMBO = [
 ]
 DATAFILES_HT29 = ['20200128_HT29_matrix_EGF_RAFi_MEKi']
 DATAFOLDER = os.path.join(os.path.dirname(MARM.__file__), 'data')
-
-pERK_IF_std = 0.2
-pMEK_IF_std = 0.2
 
 
 def fill_data_dict(data, data_dict):
@@ -272,7 +270,7 @@ def read_combo_experiment(data, df, egf, egfr_crispr, t):
                 'Cobimetinib_0_preeq': meki_conc,
                 'Cobimetinib_0_presim': meki_conc,
                 'pERK_IF_obs': float(df.values[1 + iV, 1 + iC]),
-                'pERK_IF_obs_std': pERK_IF_std,
+                'pERK_IF_obs_std': float(np.nan),
             }
 
             fill_data_dict(data, data_dict)
@@ -338,8 +336,8 @@ def load_experiment(IDs):
                 'Cobimetinib_0_preeq': 0.0,
                 'Cobimetinib_0_presim': 0.0,
                 'pERK_mean_anchor': [1, 1],
-                #'pERK_std_anchor': [1, 13],
-                'pERK_IF_obs_std': pERK_IF_std,
+                'pERK_std_anchor': [1, 13],
+                #'pERK_IF_obs_std': pERK_IF_std,
                 #'pMEK_mean_anchor': [10, 1],
                 #'pMEK_std_anchor': [10, 13],
                 #'pMEK_IF_obs_std': pMEK_IF_std,
@@ -378,7 +376,8 @@ def load_experiment(IDs):
                         'EGF_0_presim': 0.0,
                         'pERK_IF_obs': df_ERK.values[row, mean_anchor +
                                                      conc_idx],
-                        'pERK_IF_obs_std': pERK_IF_std,
+                        'pERK_IF_obs_std': df_ERK.values[row, std_anchor +
+                                                         conc_idx],
                     }
                     for drug in RAFI + PANRAFI + MEKI:
                         if df_ERK[drug].values[row] == -1:
@@ -393,7 +392,8 @@ def load_experiment(IDs):
                         data_dict.update({
                             'pMEK_IF_obs': df_MEK.values[row, mean_anchor +
                                                          conc_idx],
-                            'pMEK_IF_obs_std': pMEK_IF_std,
+                            'pMEK_IF_obs_std': df_MEK.values[row, std_anchor +
+                                                             conc_idx],
                         })
 
                     for key in data.columns.values:
@@ -440,11 +440,13 @@ def load_experiment(IDs):
                         'NRAS_Q61mut_presim': 0,
                         'pERK_IF_obs': df.values[row, mean_anchor +
                                                  conc_idx],
-                        'pERK_IF_obs_std': pERK_IF_std,
+                        'pERK_IF_obs_std': df.values[row, std_anchor +
+                                                 conc_idx],
                         'pMEK_IF_obs': df_MEK.values[row, mean_anchor +
                                                      conc_idx]
                             if ID == 'D7' else float('nan'),
-                        'pMEK_IF_obs_std': pMEK_IF_std
+                        'pMEK_IF_obs_std': df_MEK.values[row, std_anchor +
+                                                     conc_idx]
                             if ID == 'D7' else float('nan'),
                         # 'pERK_IF_obs': max(df.values[row, mean_anchor +
                         #                              conc_idx], 0.01),
@@ -502,7 +504,7 @@ def load_experiment(IDs):
                         'Cobimetinib_0_preeq': meki_conc,
                         'Cobimetinib_0_presim': meki_conc,
                         'pERK_IF_obs': row[t],
-                        'pERK_IF_obs_std': pERK_IF_std,
+                        'pERK_IF_obs_std': float('nan'),
                         'pMEK_IF_obs': float('nan'),
                         'pMEK_IF_obs_std': float('nan'),
                     }
@@ -539,7 +541,7 @@ def load_experiment(IDs):
                     'Vemurafenib_0_preeq': 0.0,
                     'Vemurafenib_0_presim': 1.0,
                     'pERK_IF_obs': row.EGF,
-                    'pERK_IF_obs_std': pERK_IF_std,
+                    'pERK_IF_obs_std': float('nan'),
                 }
 
                 fill_data_dict(data, data_dict)
@@ -738,7 +740,7 @@ def load_experiment(IDs):
                     f'{drug_b}_0_preeq': row['Concentration B (uM)'],
                     f'{drug_b}_0_presim': row['Concentration B (uM)'],
                     'pERK_IF_obs': row['pERK'],
-                    'pERK_IF_obs_std': pERK_IF_std,
+                    'pERK_IF_obs_std': float('nan'),
                 }
 
                 if ID == '20200130_A375_NRASQ61K_matrix_pERK_DOX_RAFifixed_panRAFi_MEKi.xls':
@@ -779,7 +781,7 @@ def load_experiment(IDs):
                         'EGF_0_presim': 0.0,
                         'pERK_IF_obs': df_ERK.values[row, mean_anchor +
                                                      conc_idx],
-                        'pERK_IF_obs_std': pERK_IF_std,
+                        'pERK_IF_obs_std': float('nan'),
                     }
                     for drug in RAFI + PANRAFI + MEKI:
                         if drug in ['Vemurafenib', 'Cobimetinib']:
@@ -878,6 +880,43 @@ if __name__ == '__main__':
 
     data = filter_experiments(data, instances)
     data.loc[data.time == 0.083, 'time'] = 0.0833
+
+    bio_repl = data[(data.Vemurafenib_0 > 0) &
+                    (data.EGFR_crispr == 1.0) &
+                    (data.t_presim == 0.0) &
+                    (data.time == 0.0833)]
+
+    bio_repl_no_egf = bio_repl[bio_repl.EGF_0 == 0.0]
+    bio_repl_egf = bio_repl[bio_repl.EGF_0 == 0.0]
+    for d in [bio_repl_no_egf, bio_repl_egf]:
+        xx = d.Vemurafenib_0.values
+        yy = d.pERK_IF_obs.values
+
+        def hill(p):
+            return p[2] - (p[2] - p[0]) / (1 + (10 ** p[1] / xx)) - yy
+
+        def hill_jac(p):
+            return np.vstack([
+                1 / (1 + (10 ** p[1] / xx)),
+                + (p[2] - p[0]) * 10 ** p[1] * xx * np.log(10) /
+                np.power(xx + 10 ** p[1], 2),
+                1 - 1 / (1 + (10 ** p[1] / xx))
+            ]).T
+
+        p0 = np.asarray([0.5,
+                         np.median(np.log10(xx)),
+                         min([max([yy[0], 0]), 2.5])])
+
+        res = least_squares(hill, p0, hill_jac,
+                            bounds=([0, np.min(np.log10(xx)), 0],
+                                    [1.5, np.max(np.log10(xx)), 2.5]))
+
+        yy_fit = hill(res.x)
+
+    # np.sqrt(np.mean(np.power(data.pERK_IF_obs_std,2))) = 0.05
+    data['pERK_IF_obs_std'] = 0.05
+    # np.sqrt(np.mean(np.power(data.pMEK_IF_obs_std,2))) = 0.16
+    data['pMEK_IF_obs_std'] = 0.16
     data['N_Avogadro'] = 6.02214076000000e+23
     data['volume'] = 1.00000000000000e-12
     data['m_Da_EGF'] = 6200.00000000000
