@@ -171,8 +171,6 @@ rule parameter_estimation:
 rule compute_simulation_prediction:
     input:
         model=lambda wildcards: get_instances(wildcards, 'channel_monoobs'),
-        model_cf= lambda wildcards: get_instances(wildcards,
-                                                  'channelcf_monoobs'),
         data_training=rules.process_data.output,
         data_combo=os.path.join(
             'MARM', 'data',

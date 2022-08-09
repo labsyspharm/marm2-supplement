@@ -12,8 +12,7 @@ variant = sys.argv[2]
 modifications = None
 if len(sys.argv) > 3:
     instance = sys.argv[3]
-    if any(mod in instance.split('_') for mod in ['channel', 'channelcf',
-                                                  'monoobs']):
+    if any(mod in instance.split('_') for mod in ['channel', 'monoobs']):
         modifications = instance
         instance = ''
     if len(sys.argv) > 4:
@@ -48,7 +47,7 @@ if modifications is None:
 else:
     modifications = modifications.split('_')
 
-if 'channel' in modifications or 'channelcf' in modifications:
+if 'channel' in modifications:
     MARM.model.add_monomer_label(
         model,
         'MEK',
@@ -143,75 +142,6 @@ if 'channel' in modifications or 'channelcf' in modifications:
     pysb.Observable('inhibited_pMEK_phys', MEK(meki=pysb.ANY, phospho='p', channel='phys'))
     pysb.Observable('drugfree_pMEK_onco', MEK(meki=None, phospho='p', channel='onco'))
     pysb.Observable('inhibited_pMEK_onco', MEK(meki=pysb.ANY, phospho='p', channel='onco'))
-
-    if 'channelcf' in modifications:
-        model.monomers['DUSP'].sites = ['erk_onco', 'erk_phys']
-        MARM.model.update_monomer_patterns(model, model.monomers['DUSP'])
-
-
-        def make_binding_channel_specific(rule, monomer, binding_site,
-                                          channel):
-            for pattern in [rule.rule_expression.reactant_pattern,
-                            rule.rule_expression.product_pattern]:
-                for cp in pattern.complex_patterns:
-                    for mp in cp.monomer_patterns:
-                        if mp.monomer.name == monomer \
-                                and binding_site in mp.site_conditions:
-                            mp.site_conditions[f'{binding_site}_{channel}'] = \
-                                mp.site_conditions.pop(binding_site)
-                        if mp.monomer.name == 'ERK' \
-                                and 'phospho' in mp.site_conditions \
-                                and mp.site_conditions['phospho'] == 'p':
-                            mp.site_conditions['channel'] = channel
-
-        rule_name = 'bind_DUSP_pERK'
-        onco_rule = model.rules[rule_name]
-        onco_rule.rename(onco_rule.name.replace('ERK', 'ERK_onco'))
-
-        phys_rule = copy.deepcopy(onco_rule)
-        phys_rule.name = phys_rule.name.replace('_onco', '_phys')
-        model.add_component(phys_rule)
-
-        for rule, channel in zip([onco_rule, phys_rule],
-                                 ['onco', 'phys']):
-            make_binding_channel_specific(rule, 'DUSP', 'erk', channel)
-
-        for rule_name, channel in zip(
-                ['DUSP_dephosphorylates_ERK_onco',
-                 'DUSP_dephosphorylates_ERK_phys'],
-                ['onco', 'phys']
-        ):
-            make_binding_channel_specific(
-                model.rules[rule_name], 'DUSP', 'erk', channel
-            )
-
-        rule = model.rules['synthesis_pDUSP']
-        for cp in rule.product_pattern.complex_patterns:
-            for mp in cp.monomer_patterns:
-                if mp.monomer.name == 'DUSP':
-                    condition = mp.site_conditions.pop('erk')
-                    mp.site_conditions['erk_onco'] = condition
-                    mp.site_conditions['erk_phys'] = condition
-
-        ep_name = 'ep_bind_DUSP_pERK'
-        ep_onco = model.energypatterns[ep_name]
-
-        ep_phys = copy.deepcopy(ep_onco)
-        ep_onco.rename(f'{ep_onco.name}_onco')
-        model.add_component(ep_phys)
-        ep_phys.rename(f'{ep_phys.name}_phys')
-
-        for ep, channel in zip(
-            [ep_onco, ep_phys], ['onco', 'phys']
-        ):
-
-            for mp in ep.pattern.monomer_patterns:
-                if mp.monomer.name != 'DUSP':
-                    continue
-                if 'erk' not in mp.site_conditions:
-                    continue
-                state = mp.site_conditions.pop('erk')
-                mp.site_conditions[f'erk_{channel}'] = state
 
 if 'monoobs' in modifications:
     MARM.model.add_monomer_configuration_observables(model)

@@ -72,8 +72,7 @@ def extend_datapoints(e, tps):
     e.setObservedDataStdDev(new_data_std.flatten())
 
 
-def run_and_store_simulation(sxs, filename, par_dict=None,
-                             channel_specific_dusp_binding=False):
+def run_and_store_simulation(sxs, filename, par_dict=None):
     datasets = {
         'trainingdata': sxs['dataset'],
         'finepulse': sxs['dataset'],
@@ -89,10 +88,7 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
             'MEKi_NRAS_PRAFi_RAFi_engineered_mutrascomboprediction',
         'ht29': 'EGF_EGFR_MEKi_PRAFi_RAFi_ht29'
     }
-    if channel_specific_dusp_binding:
-        modifications = 'channelcf_monoobs'
-    else:
-        modifications = 'channel_monoobs'
+    modifications = 'channel_monoobs'
     if filename.startswith('mutRAS'):
         perts = sxs['dataset'].split('_')
         for v in ['EGF', 'EGFR']:
@@ -296,8 +292,6 @@ def run_and_store_simulation(sxs, filename, par_dict=None,
         dfs.append(df_instance)
 
     df = pd.concat(dfs)
-    if channel_specific_dusp_binding:
-        filename += '_cf'
     write_analysis_dataframe(df, sxs, filename)
 
 
